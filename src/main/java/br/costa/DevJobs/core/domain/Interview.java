@@ -1,7 +1,8 @@
 package br.costa.DevJobs.core.domain;
 
-import br.costa.DevJobs.core.domain.enumInterview.SituationInterview;
-import br.costa.DevJobs.core.domain.enumInterview.TypeInterview;
+import br.costa.DevJobs.core.domain.enumarated.enumInterview.SituationInterview;
+import br.costa.DevJobs.core.domain.enumarated.enumInterview.TypeInterview;
+import br.costa.DevJobs.core.domain.enumarated.enumjobapplication.StatusApplicationEnum;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -19,9 +20,18 @@ public class Interview {
     private String linkAdress;
     private String observation;
     private Instant createdAt;
+    private JobApplication application;
 
     // getters and setters
 
+
+    public JobApplication getApplication() {
+        return application;
+    }
+
+    public void setApplication(JobApplication application) {
+        this.application = application;
+    }
 
     public UUID getId() {
         return id;
@@ -99,19 +109,20 @@ public class Interview {
     public Interview(String linkAdress,
                      String observation,
                      String interviewerName,
-                     SituationInterview situationInterview,
-                     TypeInterview typeInterview,
                      String hour,
                      String date,
-                     UUID id) {
+                     UUID id,
+                     JobApplication application,
+                     TypeInterview typeInterview) {
         this.linkAdress = linkAdress;
         this.observation = observation;
-        InterviewerName = interviewerName;
-        this.situationInterview = situationInterview;
-        this.typeInterview = typeInterview;
+        this.InterviewerName = interviewerName;
         this.hour = hour;
         this.date = date;
         this.id = id;
         this.createdAt = Instant.now();
+        this.application = application;
+        this.situationInterview = SituationInterview.Scheduled;
+        this.typeInterview = typeInterview;
     }
 }
