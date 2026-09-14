@@ -1,5 +1,7 @@
 package br.costa.DevJobs.core.domain;
 
+import br.costa.DevJobs.core.domain.enumarated.enumjobapplication.StatusApplicationEnum;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -15,8 +17,26 @@ public class JobApplication {
     private String lastUpdated;
     private Users users;
     private Instant createdAt;
+    private Instant updatedAt;
+    private StatusApplicationEnum status;
 
     // getters and setters
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public StatusApplicationEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusApplicationEnum status) {
+        this.status = status;
+    }
 
     public UUID getId() {
         return id;
@@ -109,6 +129,8 @@ public class JobApplication {
         this.lastUpdated = lastUpdated;
         this.users = users;
         this.createdAt = Instant.now();
+        this.updatedAt = this.createdAt;
+        this.status = StatusApplicationEnum.APPLICATION_SUBMITTED;
 
     }
 }
