@@ -1,12 +1,11 @@
 package br.costa.DevJobs.core.domain;
 
-import br.costa.DevJobs.core.domain.enumjobvacany.EnumJobVacancy;
-import br.costa.DevJobs.core.domain.enumjobvacany.ExpirienceLevelEnum;
+import br.costa.DevJobs.core.domain.enumarated.enumjobvacany.EnumJobVacancy;
+import br.costa.DevJobs.core.domain.enumarated.enumjobvacany.ExpirienceLevelEnum;
 
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.UUID;
 
 public class JobVacancy {
@@ -143,7 +142,6 @@ public class JobVacancy {
     }
 
     // constructors
-
     public JobVacancy(UUID id,
                       String title,
                       String nameCompany,
