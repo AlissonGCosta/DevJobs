@@ -1,5 +1,7 @@
 package br.costa.DevJobs.core.domain;
 
+import br.costa.DevJobs.core.domain.enumarated.enumuser.UserRoleEnum;
+
 import java.time.Instant;
 
 public class Users {
@@ -10,6 +12,9 @@ public class Users {
     private String email;
     private String password;
     private Instant createdAt;
+    private Instant updatedAt;
+    private UserRoleEnum role;
+
 
     // getters and setters
     public Long getId() {
@@ -52,6 +57,22 @@ public class Users {
         this.fullName = fullName;
     }
 
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public UserRoleEnum getRole() {
+        return role;
+    }
+
+    public void setRole(UserRoleEnum role) {
+        this.role = role;
+    }
+
     // constructor basic
     public Users(Long id, String password, String email, String fullName) {
         this.id = id;
@@ -59,6 +80,8 @@ public class Users {
         this.email = email;
         this.fullName = fullName;
         this.createdAt = Instant.now();
+        this.updatedAt = this.createdAt;
+        this.role = UserRoleEnum.ROLE_USER;
     }
 
 
