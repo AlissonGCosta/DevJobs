@@ -122,7 +122,7 @@ public class Interview {
         this.id = id;
         this.createdAt = Instant.now();
         this.application = application;
-        this.situationInterview = SituationInterview.Scheduled;
+        this.situationInterview = SituationInterview.SCHEDULED;
         this.typeInterview = typeInterview;
     }
 }
