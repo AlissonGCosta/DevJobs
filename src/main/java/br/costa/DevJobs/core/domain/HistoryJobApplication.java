@@ -1,6 +1,6 @@
 package br.costa.DevJobs.core.domain;
 
-import br.costa.DevJobs.core.domain.enumarated.enumhistoryjobapplication.HistoryJobApplicationEnum;
+import br.costa.DevJobs.core.domain.enumerated.enumhistoryjobapplication.HistoryJobApplicationEnum;
 
 import java.util.UUID;
 
