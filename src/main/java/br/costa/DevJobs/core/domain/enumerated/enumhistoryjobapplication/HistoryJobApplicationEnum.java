@@ -1,4 +1,4 @@
-package br.costa.DevJobs.core.domain.enumarated.enumhistoryjobapplication;
+package br.costa.DevJobs.core.domain.enumerated.enumhistoryjobapplication;
 
 public enum HistoryJobApplicationEnum {
     CREATE,
