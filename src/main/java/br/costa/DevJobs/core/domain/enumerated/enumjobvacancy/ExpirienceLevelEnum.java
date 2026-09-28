@@ -1,4 +1,4 @@
-package br.costa.DevJobs.core.domain.enumarated.enumjobvacany;
+package br.costa.DevJobs.core.domain.enumerated.enumjobvacancy;
 
 public enum ExpirienceLevelEnum {
 
