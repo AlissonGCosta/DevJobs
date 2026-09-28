@@ -68,7 +68,7 @@ As regras abaixo são executadas no construtor de `Users` e nos setters correspo
 | Campo | Regra implementada | Erro |
 | --- | --- | --- |
 | Nome completo | Entre 11 e 100 caracteres, inclusive. | `BadRequestException`, código `BRN0001`. |
-| Senha | Entre 15 e 64 caracteres, inclusive. | `BadRequestException`, código `BRN0002`. |
+| Senha | Entre 15 e 64 caracteres, inclusive. | `BadRequestException`, código `IPN0002`. |
 | Confirmação de senha | Deve ser igual à senha atual do objeto. | `BadRequestException`, código `BRN0003`. |
 
 O construtor atual é `Users(Long id, String password, String confirmPassword, String email, String fullName)`. A inclusão de `confirmPassword` altera a assinatura anterior de quatro argumentos.
@@ -79,15 +79,15 @@ Essas validações ainda não tratam valores nulos, formato de e-mail ou normali
 
 ### Consulta de disponibilidade de e-mail
 
-`EmailAvaliableUseCase.emailAvaliable(String email)` é implementado por `EmailAvaliableUseCaseImpl`, que delega a consulta a `EmailAvaliableGateway` e devolve seu resultado.
+`EmailAvaliableUseCase.emailAvaliable(String email)` é implementado por `EmailAvaliableUseCaseImpl`, que delega a consulta a `EmailAvailableGateway` e devolve seu resultado.
 
 Os nomes das classes e métodos acima correspondem à grafia existente no código.
 
 ### Cadastro de conta
 
-`RegisterAcountUseCase.create(Users user)` é implementado por `RegisterAcountUseCaseImpl`:
+`RegisterAcountUseCase.create(Users user)` é implementado por `RegisterAccountUseCaseImpl`:
 
-1. Consulta `EmailAvaliableGateway` com o e-mail do usuário.
+1. Consulta `EmailAvailableGateway` com o e-mail do usuário.
 2. Se o gateway retornar `false`, lança `ConflictException` com código `CML0001` e interrompe o cadastro.
 3. Se houver disponibilidade, chama `RegisterUseGateway.registerUser(user)`.
 4. Se o cadastro retornar `false`, lança `InternalServerErrorException` com código `ISE0001`.
@@ -102,7 +102,7 @@ Foram criadas `BadRequestException`, `ConflictException`, `InternalServerErrorEx
 | Constante de `ErrorCodeEnum` | Significado | Uso atual |
 | --- | --- | --- |
 | `BRN0001` | Nome inválido. | Validação de `Users`. |
-| `BRN0002` | Senha inválida. | Validação de `Users`. |
+| `IPN0002` | Senha inválida. | Validação de `Users`. |
 | `BRN0003` | Senha e confirmação diferentes. | Validação de `Users`. |
 | `CML0001` | E-mail já existente. | Caso de uso de cadastro. |
 | `ISE0001` | Falha ao criar a conta. | Caso de uso de cadastro. |
