@@ -1,8 +1,7 @@
 package br.costa.DevJobs.core.domain;
 
-import br.costa.DevJobs.core.domain.enumarated.enumInterview.SituationInterview;
-import br.costa.DevJobs.core.domain.enumarated.enumInterview.TypeInterview;
-import br.costa.DevJobs.core.domain.enumarated.enumjobapplication.StatusApplicationEnum;
+import br.costa.DevJobs.core.domain.enumerated.enumInterview.SituationInterview;
+import br.costa.DevJobs.core.domain.enumerated.enumInterview.TypeInterview;
 
 import java.time.Instant;
 import java.util.UUID;
