@@ -1,6 +1,6 @@
 package br.costa.DevJobs.core.domain;
 
-import br.costa.DevJobs.core.domain.enumarated.enumjobapplication.StatusApplicationEnum;
+import br.costa.DevJobs.core.domain.enumerated.enumjobapplication.StatusApplicationEnum;
 
 import java.time.Instant;
 import java.util.UUID;
