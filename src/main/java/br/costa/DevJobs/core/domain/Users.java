@@ -1,7 +1,8 @@
 package br.costa.DevJobs.core.domain;
 
-import br.costa.DevJobs.core.domain.enumarated.enumuser.UserRoleEnum;
-import br.costa.DevJobs.core.exception.BadRequestException;
+import br.costa.DevJobs.core.domain.enumerated.enumuser.UserRoleEnum;
+import br.costa.DevJobs.core.exception.InvalidPasswordException;
+import br.costa.DevJobs.core.exception.ValidateFullNameException;
 import br.costa.DevJobs.core.exception.enums.ErrorCodeEnum;
 
 import java.time.Instant;
@@ -14,9 +15,9 @@ public class Users {
     private String email;
     private String password;
     private String confirmPassword;
+    private UserRoleEnum role;
     private Instant createdAt;
     private Instant updatedAt;
-    private UserRoleEnum role;
     private Integer attempt;
 
 
@@ -93,31 +94,49 @@ public class Users {
     }
 
     // constructor basic
-    public Users(Long id, String password,String confirmPassword, String email, String fullName) {
-        this.id = id;
-        validatePassword(password);
-        validateEqualsPassword(confirmPassword);
+    public Users(
+            String fullName,
+            String email,
+            String password,
+            String confirmPassword
+
+            ) {
+
+
         this.email = email;
         validateFullName(fullName);
+        validatePassword(password);
+        validateEqualsPassword(confirmPassword);
         this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
+        this.updatedAt = Instant.now();
         this.role = UserRoleEnum.ROLE_USER;
         this.attempt = 0;
     }
 
-    // validators
+    public Users(Long id ,
+                 String fullName,
+                 String email,
+                 Instant createdAt,
+                 UserRoleEnum role) {
+        this.id = id;
+        this.fullName = fullName;
+        this.email = email;
+        this.createdAt = createdAt;
+        this.role = role;
+    }
 
+    // validators
     private void validateFullName(String fullName) {
-        if (fullName.length() <= 10 || fullName.length() > 100) {
-            throw new BadRequestException(ErrorCodeEnum.BRN0001.getMessage(), ErrorCodeEnum.BRN0001.getCode());
+        if (fullName.length() <= 5 || fullName.length() > 100) {
+            throw new ValidateFullNameException(ErrorCodeEnum.VPN0001.getMessage(), ErrorCodeEnum.VPN0001.getCode());
         }
 
         this.fullName = fullName;
     }
 
     private void validatePassword(String password) {
-        if (password.length() < 15 || password.length() > 64) {
-            throw new BadRequestException(ErrorCodeEnum.BRN0002.getMessage(), ErrorCodeEnum.BRN0002.getCode());
+        if (password.length() < 8 || password.length() > 64) {
+            throw new InvalidPasswordException(ErrorCodeEnum.IPN0001.getMessage(), ErrorCodeEnum.IPN0001.getCode());
         }
 
         this.password = password;
@@ -125,7 +144,7 @@ public class Users {
 
     private void validateEqualsPassword(String confirmPassword) {
         if(!confirmPassword.equals(getPassword())) {
-            throw new BadRequestException(ErrorCodeEnum.BRN0003.getMessage(), ErrorCodeEnum.BRN0003.getCode());
+            throw new InvalidPasswordException(ErrorCodeEnum.IPN0002.getMessage(), ErrorCodeEnum.IPN0002.getCode());
         }
 
         this.confirmPassword = confirmPassword;
