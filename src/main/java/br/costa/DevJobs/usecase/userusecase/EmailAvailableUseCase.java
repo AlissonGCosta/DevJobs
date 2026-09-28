@@ -2,7 +2,7 @@ package br.costa.DevJobs.usecase.userusecase;
 
 import br.costa.DevJobs.core.domain.Users;
 
-public interface EmailAvaliableUseCase {
+public interface EmailAvailableUseCase {
 
-    Boolean emailAvaliable(String email);
+    Boolean emailAvailable(String email);
 }
