@@ -1,4 +1,4 @@
-package br.costa.DevJobs.core.domain.enumarated.enumuser;
+package br.costa.DevJobs.core.domain.enumerated.enumuser;
 
 public enum UserRoleEnum{
 
