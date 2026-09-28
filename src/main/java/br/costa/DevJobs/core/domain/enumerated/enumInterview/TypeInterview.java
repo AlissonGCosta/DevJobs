@@ -1,4 +1,4 @@
-package br.costa.DevJobs.core.domain.enumarated.enumInterview;
+package br.costa.DevJobs.core.domain.enumerated.enumInterview;
 
 public enum TypeInterview {
 
