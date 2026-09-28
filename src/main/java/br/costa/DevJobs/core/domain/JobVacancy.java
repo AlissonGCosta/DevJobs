@@ -1,7 +1,7 @@
 package br.costa.DevJobs.core.domain;
 
-import br.costa.DevJobs.core.domain.enumarated.enumjobvacany.EnumJobVacancy;
-import br.costa.DevJobs.core.domain.enumarated.enumjobvacany.ExpirienceLevelEnum;
+import br.costa.DevJobs.core.domain.enumerated.enumjobvacancy.EnumJobVacancy;
+import br.costa.DevJobs.core.domain.enumerated.enumjobvacancy.ExpirienceLevelEnum;
 
 
 import java.math.BigDecimal;
