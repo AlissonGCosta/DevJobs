@@ -6,12 +6,15 @@ public enum ErrorCodeEnum {
     ISE0001("An error occurred while creating the account", "ISE0001"),
 
     //fullName
-    BRN0001("Invalid Name", "BRN0001"),
-    BRN0002("Invalid Password", "BRN0002"),
-    BRN0003("Passwords are different", "BRN0003"),
+    VPN0001("Invalid Name", "VPN0001"),
+
+    IPN0001("Invalid Password", "IPN0001"),
+    IPN0002("Passwords are different", "IPN0002"),
+
+    IAI0001("Id not exist", "IAI0001"),
 
     //email
-    CML0001("Email already existis", "CML0001"),
+    EAA0001("Email already existis", "CML0001"),
 
     //login
     PIN0002("Incorrect Pin, %d Remaining attempts", "PIN-0002")
