@@ -1,4 +1,4 @@
-package br.costa.DevJobs.core.domain.enumarated.enumjobapplication;
+package br.costa.DevJobs.core.domain.enumerated.enumjobapplication;
 
 public enum StatusApplicationEnum {
     APPLICATION_SUBMITTED,
