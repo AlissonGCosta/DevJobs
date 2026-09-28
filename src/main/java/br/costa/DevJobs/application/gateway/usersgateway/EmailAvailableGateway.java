@@ -1,6 +1,6 @@
 package br.costa.DevJobs.application.gateway.usersgateway;
 
-public interface EmailAvaliableGateway {
+public interface EmailAvailableGateway {
 
     Boolean emailAvaliable(String email);
 }
