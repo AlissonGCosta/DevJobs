@@ -13,6 +13,7 @@ public class IdAvailableService implements IdAvailableGateway {
 
     @Override
     public Boolean idAvailable(Long id) {
+
         return usersRepository.existsById(id);
     }
 }
