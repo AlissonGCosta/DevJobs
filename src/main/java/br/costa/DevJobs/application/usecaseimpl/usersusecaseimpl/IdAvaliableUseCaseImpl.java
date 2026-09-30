@@ -1,7 +1,6 @@
-package br.costa.DevJobs.application.usecaseimpl.usersusecase;
+package br.costa.DevJobs.application.usecaseimpl.usersusecaseimpl;
 
 import br.costa.DevJobs.application.gateway.usersgateway.IdAvailableGateway;
-import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.usecase.userusecase.IdAvailableUseCase;
 
 public class IdAvaliableUseCaseImpl implements IdAvailableUseCase {
@@ -14,6 +13,7 @@ public class IdAvaliableUseCaseImpl implements IdAvailableUseCase {
 
     @Override
     public Boolean idAvailable(Long id) {
+
         return idAvailableGateway.idAvailable(id);
     }
 }
