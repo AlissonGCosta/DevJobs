@@ -11,10 +11,13 @@ public enum ErrorCodeEnum {
     IPN0001("Invalid Password", "IPN0001"),
     IPN0002("Passwords are different", "IPN0002"),
 
-    IAI0001("Id not exist", "IAI0001"),
+    //id
+    IAI0001("Id not found", "IAI0001"),
+    IAI0002("Id already existis", "IAI0002"),
 
     //email
     EAA0001("Email already existis", "CML0001"),
+    EAA0002("Email not found", "CML0002"),
 
     //login
     PIN0002("Incorrect Pin, %d Remaining attempts", "PIN-0002")
