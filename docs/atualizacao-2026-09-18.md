@@ -2,6 +2,8 @@
 
 Registro das alterações commitadas em 18/09/2026, considerando o fuso `America/Sao_Paulo`. A documentação acumulada do projeto está no [README](../README.md).
 
+Este registro descreve a revisão daquela data. Para os recursos e a verificação de 30/09/2026, consulte o [registro mais recente](atualizacao-2026-09-30.md). Os links das duas implementações de casos de uso abaixo foram atualizados para os nomes e o pacote atuais.
+
 ## O que foi entregue nesta etapa
 
 - **Validações de usuário:** nome completo entre 11 e 100 caracteres, senha entre 15 e 64 e confirmação igual à senha. O usuário passa a ter `confirmPassword` e contador `attempt` inicializado em zero.
@@ -39,8 +41,8 @@ Cada commit abaixo altera exatamente um arquivo. As mensagens seguem Conventiona
 | `b812001` | [RegisterUseGateway.java](../src/main/java/br/costa/DevJobs/application/gateway/usersgateway/RegisterUseGateway.java) | `feat(user): add registration gateway contract` |
 | `73be54e` | [EmailAvaliableUseCase.java](../src/main/java/br/costa/DevJobs/usecase/userusecase/EmailAvaliableUseCase.java) | `feat(user): add email availability use case contract` |
 | `4c20a04` | [RegisterAcountUseCase.java](../src/main/java/br/costa/DevJobs/usecase/userusecase/RegisterAcountUseCase.java) | `feat(user): add account registration use case contract` |
-| `de28893` | [EmailAvaliableUseCaseImpl.java](../src/main/java/br/costa/DevJobs/application/usecaseimpl/usersusecase/EmailAvaliableUseCaseImpl.java) | `feat(user): delegate email availability checks to gateway` |
-| `caf7ecd` | [RegisterAcountUseCaseImpl.java](../src/main/java/br/costa/DevJobs/application/usecaseimpl/usersusecase/RegisterAcountUseCaseImpl.java) | `feat(user): implement account registration flow` |
+| `de28893` | [EmailAvailableUseCaseImpl.java](../src/main/java/br/costa/DevJobs/application/usecaseimpl/usersusecaseimpl/EmailAvailableUseCaseImpl.java) | `feat(user): delegate email availability checks to gateway` |
+| `caf7ecd` | [RegisterAccountUseCaseImpl.java](../src/main/java/br/costa/DevJobs/application/usecaseimpl/usersusecaseimpl/RegisterAccountUseCaseImpl.java) | `feat(user): implement account registration flow` |
 | `f666a83` | [UsersTest.java](../src/test/java/br/costa/DevJobs/core/domain/users/UsersTest.java) | `test(user): reject passwords shorter than fifteen characters` |
 | `53acb2b` | [README.md](../README.md) | `docs(project): document current implementation and setup` |
 
