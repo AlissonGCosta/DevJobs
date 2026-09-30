@@ -2,119 +2,124 @@
 
 Projeto de back-end para organizar vagas, candidaturas e entrevistas de emprego, desenvolvido com Java e Spring Boot.
 
-**Estado documentado em 18/09/2026:** modelos de domínio e primeiros casos de uso de usuário implementados. A integração com persistência e a API de negócio ainda estão em desenvolvimento.
+**Estado documentado em 30/09/2026:** o código inclui cadastro, consulta por ID, listagem e atualização de usuários, persistência JPA, hash BCrypt e tratamento de usuário não encontrado. A verificação desta entrega encontrou um erro de compilação na configuração do caso de uso de atualização; os testes não chegaram a executar.
 
-O [planejamento original](DevJobs-Projeto.md) descreve o produto desejado e os endpoints previstos. Este README registra o que existe no código. As entregas desta etapa e o texto para LinkedIn estão no [registro de 18/09/2026](docs/atualizacao-2026-09-18.md).
+O [planejamento original](DevJobs-Projeto.md) descreve o produto desejado. Os registros de [18/09/2026](docs/atualizacao-2026-09-18.md) e [30/09/2026](docs/atualizacao-2026-09-30.md) documentam as respectivas etapas.
 
 ## Tecnologias presentes
 
-| Tecnologia | Uso no estado atual |
+| Tecnologia | Uso no código atual |
 | --- | --- |
-| Java 21 | Versão configurada no `pom.xml`. |
-| Spring Boot 4.1.0 | Inicialização e configuração automática da aplicação. |
-| Maven Wrapper | Build e execução; distribuição configurada na versão 3.9.16. |
-| Spring Web MVC | Dependência adicionada; controllers de negócio pendentes. |
-| Spring Data JPA | Dependência adicionada; entidades de persistência e repositories pendentes. |
-| Spring Security | Configuração automática padrão; autenticação própria e JWT pendentes. |
-| Bean Validation | Dependência adicionada; as validações atuais de usuário são métodos do domínio. |
-| H2 e PostgreSQL | Drivers disponíveis; o teste de contexto usa H2 em memória. Não há conexão PostgreSQL configurada. |
-| Flyway | Dependência adicionada; ainda não existem scripts de migração. |
-| Lombok | Dependência e processador de anotações configurados. |
-| JUnit Jupiter | Teste de contexto e primeiro teste unitário do domínio. |
+| Java 21 | Versão de compilação configurada no `pom.xml`. |
+| Spring Boot 4.1.0 | Inicialização e configuração da aplicação. |
+| Maven Wrapper 3.9.16 | Build, testes e execução. |
+| Spring Web MVC | Controller REST de usuários. |
+| Spring Data JPA | `UsersEntity`, `UsersRepository` e serviços de persistência. |
+| Spring Security | Configuração permissiva de desenvolvimento e `BCryptPasswordEncoder`. |
+| Bean Validation | `@Valid` nas entradas do controller e `@NotNull` nos DTOs de cadastro e atualização. |
+| H2 e PostgreSQL | H2 em memória configurado; driver PostgreSQL disponível, sem conexão configurada. |
+| Flyway | Dependência presente, desabilitada na configuração local; sem migrações do projeto. |
+| Lombok | Construtores, getters e setters da infraestrutura. |
+| JUnit Jupiter | Seis testes de domínio e um teste de contexto definidos. |
 
 ## Organização do código
-
-As responsabilidades estão distribuídas entre domínio, contratos de casos de uso e aplicação. O domínio utiliza classes Java sem anotações de persistência.
 
 ```text
 src/main/java/br/costa/DevJobs/
 ├── DevJobsApplication.java
 ├── core/
 │   ├── domain/
-│   │   ├── Users.java
-│   │   ├── JobVacancy.java
-│   │   ├── JobApplication.java
-│   │   ├── Interview.java
-│   │   ├── HistoryJobApplication.java
-│   │   └── enumarated/
+│   │   └── enumerated/
 │   └── exception/
-│       └── enums/ErrorCodeEnum.java
+│       └── enums/
 ├── usecase/userusecase/
-└── application/
-    ├── gateway/usersgateway/
-    └── usecaseimpl/usersusecase/
+├── application/
+│   ├── gateway/usersgateway/
+│   └── usecaseimpl/usersusecaseimpl/
+└── infrastructure/
+    ├── Entity/
+    ├── config/
+    ├── controller/
+    ├── dto/
+    │   ├── request/
+    │   └── response/
+    ├── exception/
+    ├── mappers/
+    ├── persistence/
+    └── service/
 ```
 
-Os casos de uso recebem gateways pelo construtor. Esses contratos permitem conectar a lógica à infraestrutura posteriormente. Ainda não existem implementações dos gateways nem configuração desses casos de uso como beans do Spring.
+O domínio usa classes Java sem anotações JPA. Os casos de uso recebem gateways pelo construtor; os serviços de infraestrutura implementam esses contratos com o repository. `UsersUseCaseConfig` compõe os casos de uso, e `UserMapper` é um componente Spring responsável pelas conversões.
 
-## Modelagem já implementada
+Os modelos de vaga (`JobVacancy`), candidatura (`JobApplication`), entrevista (`Interview`) e histórico (`HistoryJobApplication`) também estão presentes. Seus fluxos completos de API e persistência continuam pendentes.
 
-| Classe | Responsabilidade e comportamento atual |
-| --- | --- |
-| `Users` | Dados do usuário, senha e confirmação, perfil e contador de tentativas. O construtor valida nome e senha, atribui `ROLE_USER`, inicia `attempt` em zero e define `createdAt` e `updatedAt` com o mesmo instante. |
-| `JobVacancy` | Título, empresa, descrição, modelo de trabalho, endereço, nível de experiência, tecnologia, salário, link, observação e usuário responsável. O construtor define `createdAt`; `updatedAt` ainda depende de atribuição explícita. |
-| `JobApplication` | Dados da candidatura, canal utilizado, contato do recrutador, observação e usuário. Inicia com `APPLICATION_SUBMITTED` e datas de criação e atualização iguais. Ainda não possui referência a `JobVacancy`. |
-| `Interview` | Data, horário, tipo, entrevistador, endereço/link e observação. Está vinculada a `JobApplication` e inicia com `SituationInterview.SCHEDULED`. |
-| `HistoryJobApplication` | Estrutura para registrar eventos, valores anterior e novo, descrição, data, hora e candidatura relacionada. A geração automática desse histórico ainda não foi implementada. |
+## API de usuários
 
-Os enums representam perfis de usuário, modelo de trabalho, nível de experiência, status de candidatura, tipo e situação da entrevista e eventos de histórico.
+As rotas abaixo estão declaradas em `UsersController`, com base `/v1/users`. Sua execução nesta revisão depende da correção do erro de compilação descrito em “Verificação”.
 
-Os status disponíveis de candidatura são `APPLICATION_SUBMITTED`, `UNDER_REVIEW`, `INTERVIEW_SCHEDULED`, `INTERVIEW_COMPLETED`, `OFFER_RECEIVED`, `APPROVED`, `REJECTED` e `WITHDRAWN`. A existência desses valores ainda não inclui regras para transições entre eles.
-
-## Validações de usuário
-
-As regras abaixo são executadas no construtor de `Users` e nos setters correspondentes.
-
-| Campo | Regra implementada | Erro |
+| Método e rota | Entrada | Resposta de sucesso declarada |
 | --- | --- | --- |
-| Nome completo | Entre 11 e 100 caracteres, inclusive. | `BadRequestException`, código `BRN0001`. |
-| Senha | Entre 15 e 64 caracteres, inclusive. | `BadRequestException`, código `IPN0002`. |
-| Confirmação de senha | Deve ser igual à senha atual do objeto. | `BadRequestException`, código `BRN0003`. |
+| `POST /v1/users` | `fullName`, `email`, `password`, `confirmPassword` | `201`: nome e e-mail. |
+| `GET /v1/users/{id}` | ID no caminho | `200`: ID, nome, e-mail, criação e perfil. |
+| `GET /v1/users` | Sem corpo | `200`: lista com os mesmos campos da consulta por ID. |
+| `PUT /v1/users/{id}` | ID no caminho; `fullName` e `email` no corpo | `200`: nome, e-mail e `updatedAt`. |
 
-O construtor atual é `Users(Long id, String password, String confirmPassword, String email, String fullName)`. A inclusão de `confirmPassword` altera a assinatura anterior de quatro argumentos.
+Exemplo de corpo de cadastro:
 
-Essas validações ainda não tratam valores nulos, formato de e-mail ou normalização de espaços. Alterar a senha pelo setter não revalida automaticamente a confirmação já armazenada. O contador `attempt` possui valor inicial e acesso por getter/setter; não existe fluxo de login ou bloqueio associado. Também não há implementação de hash de senha nesta etapa.
+```json
+{
+  "fullName": "Pessoa Exemplo",
+  "email": "pessoa@example.com",
+  "password": "senha-exemplo-123",
+  "confirmPassword": "senha-exemplo-123"
+}
+```
 
-## Casos de uso de usuário
+Exemplo de corpo de atualização:
 
-### Consulta de disponibilidade de e-mail
+```json
+{
+  "fullName": "Pessoa Atualizada",
+  "email": "pessoa.atualizada@example.com"
+}
+```
 
-`EmailAvaliableUseCase.emailAvaliable(String email)` é implementado por `EmailAvaliableUseCaseImpl`, que delega a consulta a `EmailAvailableGateway` e devolve seu resultado.
+O cadastro verifica a existência do e-mail antes de persistir. Embora o método se chame `emailAvailable`, o serviço usa `existsByEmail`: `true` indica e-mail já cadastrado. `UserMapper` gera hashes BCrypt para senha e confirmação ao criar a entidade; esses campos não aparecem nos DTOs de resposta.
 
-Os nomes das classes e métodos acima correspondem à grafia existente no código.
+A consulta por ID verifica a existência do usuário. A listagem usa `findAll` do repository e converte os resultados para DTOs por meio de `FindAllConfig`, sem paginação.
 
-### Cadastro de conta
+A atualização carrega o usuário, verifica o e-mail, altera nome, e-mail e data de atualização e salva a entidade em um serviço transacional. No código atual, enviar o próprio e-mail já cadastrado também dispara `EmailAvaliableException`; ainda não há uma exceção à verificação de duplicidade para o titular.
 
-`RegisterAcountUseCase.create(Users user)` é implementado por `RegisterAccountUseCaseImpl`:
+## Validações e erros
 
-1. Consulta `EmailAvailableGateway` com o e-mail do usuário.
-2. Se o gateway retornar `false`, lança `ConflictException` com código `CML0001` e interrompe o cadastro.
-3. Se houver disponibilidade, chama `RegisterUseGateway.registerUser(user)`.
-4. Se o cadastro retornar `false`, lança `InternalServerErrorException` com código `ISE0001`.
-5. Quando o cadastro retorna `true`, conclui sem valor de retorno (`void`).
+O construtor de cadastro é `Users(String fullName, String email, String password, String confirmPassword)`.
 
-O fluxo depende dos contratos dos gateways. A gravação em banco e a consulta real de e-mail ainda precisam de adaptadores. Os retornos usam `Boolean` e não têm tratamento explícito para `null`.
-
-## Exceções e códigos de erro
-
-Foram criadas `BadRequestException`, `ConflictException`, `InternalServerErrorException` e `NotFoundException`, todas derivadas de `RuntimeException`, com mensagem e campo interno de código. Ainda não existe um handler que converta essas exceções em respostas HTTP.
-
-| Constante de `ErrorCodeEnum` | Significado | Uso atual |
+| Campo | Regra de domínio | Exceção e código |
 | --- | --- | --- |
-| `BRN0001` | Nome inválido. | Validação de `Users`. |
-| `IPN0002` | Senha inválida. | Validação de `Users`. |
-| `BRN0003` | Senha e confirmação diferentes. | Validação de `Users`. |
-| `CML0001` | E-mail já existente. | Caso de uso de cadastro. |
-| `ISE0001` | Falha ao criar a conta. | Caso de uso de cadastro. |
-| `PIN0002` | PIN incorreto, com quantidade de tentativas na mensagem. | Apenas código e formatador definidos; fluxo de PIN pendente. O valor retornado por `getCode()` é `PIN-0002`. |
+| Nome completo | Entre 6 e 100 caracteres. | `ValidateFullNameException`, `VPN0001`. |
+| Senha | Entre 8 e 64 caracteres. | `InvalidPasswordException`, `IPN0001`. |
+| Confirmação | Igual à senha. | `InvalidPasswordException`, `IPN0002`. |
 
-`NotFoundException` está disponível, mas ainda não é utilizada por um caso de uso.
+Os DTOs exigem campos não nulos. Não há validação de formato de e-mail nem normalização de espaços. O construtor de dois argumentos usado para transportar a atualização apenas atribui nome e e-mail; o nome é validado posteriormente pelo setter do usuário carregado.
 
-## Como executar
+`GlobalExceptionHandler` traduz `IdFoundAvailableException` em HTTP `404`, com `timestamp`, `status`, `erro`, `message`, `path` e `errors`. No tratamento atual, `errors` recebe `null`; o record `Error` prepara a estrutura para detalhes por campo, mas ainda não é preenchido por esse handler.
 
-Pré-requisito: JDK 21 instalado e `JAVA_HOME` apontando para ele. O wrapper baixa o Maven e as dependências quando necessário.
+O handler próprio ainda não padroniza as demais exceções de domínio nem as respostas de Bean Validation.
 
-No Windows, a partir da raiz do projeto:
+| Constante | Código retornado | Uso |
+| --- | --- | --- |
+| `IAI0001` | `IAI0001` | Usuário não encontrado. |
+| `IAI0002` | `IAI0002` | ID já existente; definido, sem uso no fluxo atual. |
+| `EAA0001` | `CML0001` | E-mail já cadastrado. |
+| `EAA0002` | `CML0002` | E-mail não encontrado; definido, sem uso no fluxo atual. |
+| `ISE0001` | `ISE0001` | Falha sinalizada pelo gateway de cadastro. |
+| `PIN0002` | `PIN-0002` | Mensagem de PIN com tentativas; fluxo de autenticação pendente. |
+
+## Execução local
+
+Use JDK 21 e `JAVA_HOME` configurado. O wrapper baixa o Maven e as dependências quando necessário.
+
+No Windows:
 
 ```powershell
 .\mvnw.cmd test
@@ -128,38 +133,29 @@ No Linux ou macOS:
 ./mvnw spring-boot:run
 ```
 
-O arquivo `src/main/resources/application.yaml` define apenas o nome `DevJobs`. O teste de contexto inicializa H2 em memória e usa a segurança padrão do Spring. Iniciar a aplicação ainda não disponibiliza os endpoints planejados de cadastro, login ou candidaturas.
+Após resolver a compilação, a configuração local usa `jdbc:h2:mem:devjobs;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE`, usuário `sa` e senha vazia. O console H2 fica em `/h2-console`, e o Hibernate gerencia as tabelas com `ddl-auto: update`. Os dados são temporários e não sobrevivem ao encerramento do processo.
 
-## Testes e verificação
+A configuração de segurança permite todas as requisições e desabilita CSRF. A regra explícita para `PUT` adicionada nesta etapa mantém esse comportamento já permissivo. Autenticação própria, autorização por usuário e JWT permanecem pendentes.
 
-| Teste existente | O que verifica |
-| --- | --- |
-| `DevJobsApplicationTests.contextLoads` | Inicialização do contexto Spring com a configuração atual. |
-| `UsersTest.shouldRejectPasswithminor15Characters` | Uma senha de seis caracteres é rejeitada com `BadRequestException`. |
+## Verificação
 
-Em **18/09/2026**, `mvnw.cmd test` foi executado com **Temurin 21.0.12** e terminou com **BUILD SUCCESS: 2 testes, 0 falhas, 0 erros e 0 ignorados**.
+Em **30/09/2026**, foi executado `.\mvnw.cmd test -B -ntp` com Java **25.0.2**, compilação configurada para Java 21 e Maven Wrapper **3.9.16**.
 
-A execução apresentou avisos sobre a versão do H2 em relação à versão verificada pelo Flyway, ausência de migrações, `open-in-view` e carregamento dinâmico do agente do Mockito. Esses avisos não impediram os testes. A cobertura atual ainda não verifica os demais limites das validações, os fluxos de cadastro ou a persistência.
+Resultado: **BUILD FAILURE na compilação**, antes da execução dos testes. Em `UsersUseCaseConfig.java:46`, a criação de `PutUsersUseCaseImpl` fornece quatro argumentos, incluindo `IdAvailableUseCase`, mas o construtor recebe apenas `PutUsersGateway`, `EmailAvailableUseCase` e `FindByIdUsersUseCase`. Essa incompatibilidade já estava nas alterações recebidas e foi mantida nesta entrega de documentação e commits.
 
-## Evolução até aqui
+A suíte definida contém seis casos em `UsersTest` (senha curta, senha longa, nome curto, nome longo, confirmação diferente e cadastro válido) e `DevJobsApplicationTests.contextLoads`. Não há resultado aprovado da suíte para esta revisão nem validação HTTP dos novos endpoints.
 
-| Data dos commits | Entregas |
-| --- | --- |
-| 20/08/2026 | Estrutura inicial Spring Boot, dependências, Maven Wrapper, configuração da aplicação e teste de contexto. |
-| 13/09/2026 | Planejamento do produto, modelos de usuário, vaga, candidatura e entrevista, além dos primeiros enums. |
-| 14/09/2026 | Perfis de usuário, status de candidatura, modelo de histórico, vínculo entre entrevista e candidatura e reorganização dos enums. |
-| 18/09/2026 | Validações de usuário, confirmação de senha, contador inicial de tentativas, contratos e implementações dos primeiros casos de uso, gateways, exceções, códigos de erro, primeiro teste unitário do domínio e correção da constante `SCHEDULED`. Documentação do estado atual. |
+O resultado histórico de dois testes aprovados em 18/09/2026 pertence àquela revisão e está preservado no registro da data.
 
-## Próximas etapas do projeto
+## Próximas etapas
 
-- Implementar os adaptadores dos gateways, entidades de persistência, repositories e migrações.
-- Configurar PostgreSQL e a composição dos casos de uso no Spring.
-- Expor controllers e DTOs, com tratamento centralizado de erros HTTP.
-- Completar validações e testes dos caminhos de sucesso, conflito, falha e valores de limite.
-- Implementar hash de senha e autenticação, incluindo o fluxo de JWT previsto no planejamento.
-- Desenvolver o CRUD de candidaturas, mudanças de status e geração de histórico.
-- Adicionar documentação OpenAPI, interface, dashboard e demais funcionalidades previstas no escopo.
+- Alinhar a configuração de `PutUsersUseCaseImpl` ao seu construtor e executar a suíte.
+- Permitir atualização mantendo o e-mail do próprio usuário.
+- Completar testes de casos de uso, controller, persistência e respostas de erro.
+- Expandir o tratamento HTTP das exceções e as validações dos dados de entrada.
+- Implementar autenticação e autorização; revisar a persistência da confirmação de senha.
+- Configurar PostgreSQL e migrações, adicionar paginação e desenvolver os fluxos de vagas, candidaturas e entrevistas.
 
 ## Convenção dos commits
 
-Esta entrega utiliza Conventional Commits no formato `tipo(escopo): descrição`, com um arquivo por commit. A alteração incompatível do construtor de `Users` está indicada por `!` e pelo rodapé `BREAKING CHANGE`.
+As mensagens seguem `tipo(escopo): descrição`, com um commit dedicado por arquivo alterado ou criado. Uma renomeação reúne o caminho antigo e o novo do mesmo arquivo em um único commit. A relação de arquivos e commits desta entrega está no [registro de 30/09/2026](docs/atualizacao-2026-09-30.md).
