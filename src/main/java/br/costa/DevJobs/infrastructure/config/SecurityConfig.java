@@ -21,6 +21,7 @@ public class SecurityConfig {
                         .requestMatchers(h2Console).permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/**").permitAll()
                         .anyRequest().permitAll())
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
