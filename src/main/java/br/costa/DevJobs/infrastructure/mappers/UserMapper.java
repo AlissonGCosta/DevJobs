@@ -2,11 +2,21 @@ package br.costa.DevJobs.infrastructure.mappers;
 
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.infrastructure.Entity.UsersEntity;
+import br.costa.DevJobs.infrastructure.config.PasswordConfig;
+import br.costa.DevJobs.infrastructure.dto.request.PutUserRequestDto;
 import br.costa.DevJobs.infrastructure.dto.request.UsersRequestDto;
+import br.costa.DevJobs.infrastructure.dto.response.PutUserResponseDto;
 import br.costa.DevJobs.infrastructure.dto.response.UserResponseFindByIdDto;
 import br.costa.DevJobs.infrastructure.dto.response.UsersResponseDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+
+@RequiredArgsConstructor
+@Component
 public class UserMapper {
+
+    private final PasswordConfig passwordConfig;
 
     public Users RequestDtoToUsers(UsersRequestDto dto) {
         return new Users(
@@ -21,8 +31,8 @@ public class UserMapper {
         return new UsersEntity(
                 user.getFullName(),
                 user.getEmail(),
-                user.getPassword(),
-                user.getConfirmPassword(),
+                passwordConfig.passwordEncoder().encode(user.getPassword()),
+                passwordConfig.passwordEncoder().encode(user.getConfirmPassword()),
                 user.getRole(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
@@ -55,6 +65,21 @@ public class UserMapper {
                 user.getEmail(),
                 user.getCreatedAt(),
                 user.getRole()
+        );
+    }
+
+    public Users PutUsersRequestDtoToUsers(PutUserRequestDto dto) {
+        return new Users(
+                dto.fullName(),
+                dto.email()
+        );
+    }
+
+    public PutUserResponseDto UsersDomaintoPutResponseDto(Users user) {
+        return new PutUserResponseDto(
+                user.getFullName(),
+                user.getEmail(),
+                user.getUpdatedAt()
         );
     }
 }
