@@ -125,6 +125,14 @@ public class Users {
         this.role = role;
     }
 
+    public Users(
+                 String fullName,
+                 String email){
+        this.fullName = fullName;
+        this.email = email;
+
+    }
+
     // validators
     private void validateFullName(String fullName) {
         if (fullName.length() <= 5 || fullName.length() > 100) {
