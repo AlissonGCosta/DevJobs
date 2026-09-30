@@ -1,4 +1,4 @@
-package br.costa.DevJobs.application.usecaseimpl.usersusecase;
+package br.costa.DevJobs.application.usecaseimpl.usersusecaseimpl;
 
 import br.costa.DevJobs.application.gateway.usersgateway.EmailAvailableGateway;
 import br.costa.DevJobs.usecase.userusecase.EmailAvailableUseCase;
