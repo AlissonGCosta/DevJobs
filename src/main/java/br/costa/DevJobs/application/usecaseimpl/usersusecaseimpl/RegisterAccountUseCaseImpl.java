@@ -1,4 +1,4 @@
-package br.costa.DevJobs.application.usecaseimpl.usersusecase;
+package br.costa.DevJobs.application.usecaseimpl.usersusecaseimpl;
 
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.application.gateway.usersgateway.RegisterUserGateway;
