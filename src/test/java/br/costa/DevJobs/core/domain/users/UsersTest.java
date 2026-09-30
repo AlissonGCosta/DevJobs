@@ -16,11 +16,10 @@ public class UsersTest {
 
         assertThrows(InvalidPasswordException.class, () -> {
             new Users(
-                    null,
-                    shortPassword,
-                    shortPassword,
+                    "Alisson test",
                     "test@email.com",
-                    "Alisson test"
+                    shortPassword,
+                    shortPassword
             );
         });
     }
@@ -31,11 +30,10 @@ public class UsersTest {
         String bigPassword = "aseiufgbasiugansgnaiasiasiusaiuuifausaiusgiuasiufgiyuasgfiuygasiufgiausfiuahbsduibasjbcvjxbziubqjasikujauxb";
         assertThrows(InvalidPasswordException.class, () -> {
             new Users(
-                    null,
-                    bigPassword,
-                    bigPassword,
+                    "Alisson test",
                     "test@email.com",
-                    "Alisson test"
+                    bigPassword,
+                    bigPassword
             );
         });
     }
@@ -46,11 +44,10 @@ public class UsersTest {
         String password = "teste123456789010101";
         assertThrows(ValidateFullNameException.class, () -> {
             new Users(
-                    null,
-                    password,
-                    password,
+                    "OPA",
                     "test@email.com",
-                    "OPA"
+                    password,
+                    password
             );
         });
     }
@@ -62,11 +59,10 @@ public class UsersTest {
         String password = "teste123456789010101";
         assertThrows(ValidateFullNameException.class, () -> {
             new Users(
-                    null,
+                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLIIIIIIIIIIIIIIIIIIIIIIIIIIISSSSSSSSSSSSSSSSSSSSSSSSSSSSOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+                    "test@mail.com",
                     password,
-                    password,
-                    "test@email.com",
-                    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLIIIIIIIIIIIIIIIIIIIIIIIIIIISSSSSSSSSSSSSSSSSSSSSSSSSSSSOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN"
+                    password
             );
         });
     }
@@ -77,11 +73,10 @@ public class UsersTest {
         String password = "teste123456789010101";
         assertThrows(InvalidPasswordException.class, () -> {
             new Users(
-                    null,
-                    password,
-                    "teste1234",
+                    "Alisson",
                     "test@email.com",
-                    "alisson"
+                    password,
+                    "teste12345"
             );
         });
     }
@@ -91,11 +86,10 @@ public class UsersTest {
         String pass = "teste1234";
 
         Users users = assertDoesNotThrow(() -> new Users(
-                null,
-                pass,
-                pass,
+                "Alisson Costa",
                 "test@email.com",
-                "Alisson Costa"
+                pass,
+                pass
         ));
         assertEquals("Alisson Costa", users.getFullName());
         assertEquals("test@email.com", users.getEmail());
