@@ -1,16 +1,14 @@
 package br.costa.DevJobs.infrastructure.controller;
 
 import br.costa.DevJobs.infrastructure.config.FindAllConfig;
+import br.costa.DevJobs.infrastructure.dto.request.PatchUserPassRequestDto;
 import br.costa.DevJobs.infrastructure.dto.request.PutUserRequestDto;
 import br.costa.DevJobs.infrastructure.dto.request.UsersRequestDto;
 import br.costa.DevJobs.infrastructure.dto.response.PutUserResponseDto;
 import br.costa.DevJobs.infrastructure.dto.response.UserResponseFindByIdDto;
 import br.costa.DevJobs.infrastructure.dto.response.UsersResponseDto;
 import br.costa.DevJobs.infrastructure.mappers.UserMapper;
-import br.costa.DevJobs.usecase.userusecase.FindAllUsersUseCase;
-import br.costa.DevJobs.usecase.userusecase.FindByIdUsersUseCase;
-import br.costa.DevJobs.usecase.userusecase.PutUsersUseCase;
-import br.costa.DevJobs.usecase.userusecase.RegisterAccountUseCase;
+import br.costa.DevJobs.usecase.userusecase.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +26,7 @@ public class UsersController {
     private final RegisterAccountUseCase registerAccountUseCase;
     private final FindByIdUsersUseCase findByIdUsersUseCase;
     private final PutUsersUseCase putUsersUseCase;
+    private final PatchPassUseCase patchPassUseCase;
 
 
     private final UserMapper userMapper;
@@ -44,7 +43,7 @@ public class UsersController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserResponseFindByIdDto findById(@PathVariable Long id) {
-       return userMapper.UserDomainToUserResponseFindById(findByIdUsersUseCase.findById(id));
+       return userMapper.userDomainToUserResponseFindById(findByIdUsersUseCase.findById(id));
     }
 
     @GetMapping
@@ -54,7 +53,16 @@ public class UsersController {
     }
 
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public PutUserResponseDto update(@PathVariable Long id, @RequestBody @Valid PutUserRequestDto dto) {
-        return userMapper.UsersDomaintoPutResponseDto(putUsersUseCase.putUsers(userMapper.PutUsersRequestDtoToUsers(dto), id));
+        return userMapper.usersDomaintoPutResponseDto(putUsersUseCase.putUsers(userMapper.putUsersRequestDtoToUsers(dto), id));
+    }
+
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void updatePass(@PathVariable Long id, @RequestBody @Valid PatchUserPassRequestDto dto) {
+
+        patchPassUseCase.patchPass(userMapper.patchPassRequestToUsers(dto), id);
+
     }
 }
