@@ -3,6 +3,7 @@ package br.costa.DevJobs.infrastructure.mappers;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.infrastructure.Entity.UsersEntity;
 import br.costa.DevJobs.infrastructure.config.PasswordConfig;
+import br.costa.DevJobs.infrastructure.dto.request.PatchUserPassRequestDto;
 import br.costa.DevJobs.infrastructure.dto.request.PutUserRequestDto;
 import br.costa.DevJobs.infrastructure.dto.request.UsersRequestDto;
 import br.costa.DevJobs.infrastructure.dto.response.PutUserResponseDto;
@@ -58,7 +59,7 @@ public class UserMapper {
         );
     }
 
-    public UserResponseFindByIdDto UserDomainToUserResponseFindById(Users user) {
+    public UserResponseFindByIdDto userDomainToUserResponseFindById(Users user) {
         return new UserResponseFindByIdDto(
                 user.getId(),
                 user.getFullName(),
@@ -68,18 +69,28 @@ public class UserMapper {
         );
     }
 
-    public Users PutUsersRequestDtoToUsers(PutUserRequestDto dto) {
+    public Users putUsersRequestDtoToUsers(PutUserRequestDto dto) {
         return new Users(
                 dto.fullName(),
                 dto.email()
         );
     }
 
-    public PutUserResponseDto UsersDomaintoPutResponseDto(Users user) {
+    public PutUserResponseDto usersDomaintoPutResponseDto(Users user) {
         return new PutUserResponseDto(
                 user.getFullName(),
                 user.getEmail(),
                 user.getUpdatedAt()
         );
     }
+
+    public Users patchPassRequestToUsers(PatchUserPassRequestDto dto) {
+        return new Users(
+                dto.oldPassword(),
+                dto.newPassword(),
+                dto.confirmNewPassword()
+        );
+    }
+
+
 }
