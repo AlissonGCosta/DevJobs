@@ -19,6 +19,9 @@ public enum ErrorCodeEnum {
     EAA0001("Email already existis", "CML0001"),
     EAA0002("Email not found", "CML0002"),
 
+    //pass
+    PSE0001("Passwords are different", "PSS0001"),
+
     //login
     PIN0002("Incorrect Pin, %d Remaining attempts", "PIN-0002")
 
