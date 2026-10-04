@@ -13,6 +13,7 @@ public class Users {
     private Long id;
     private String fullName;
     private String email;
+    private String oldPassword;
     private String password;
     private String confirmPassword;
     private UserRoleEnum role;
@@ -22,6 +23,16 @@ public class Users {
 
 
     // getters and setters
+
+
+    public String getOldPassword() {
+        return oldPassword;
+    }
+
+    public void setOldPassword(String oldPassword) {
+        this.oldPassword = oldPassword;
+    }
+
     public Long getId() {
         return id;
     }
@@ -133,6 +144,17 @@ public class Users {
 
     }
 
+    public Users(
+            String oldPassword,
+            String password,
+            String confirmPassword){
+
+        this.oldPassword = oldPassword;
+        validatePassword(password);
+        validateEqualsPassword(confirmPassword);
+    }
+
+
     // validators
     private void validateFullName(String fullName) {
         if (fullName.length() <= 5 || fullName.length() > 100) {
@@ -157,6 +179,7 @@ public class Users {
 
         this.confirmPassword = confirmPassword;
     }
+
 
 
 }
