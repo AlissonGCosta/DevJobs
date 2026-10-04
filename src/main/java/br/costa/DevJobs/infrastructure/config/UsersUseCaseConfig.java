@@ -45,4 +45,18 @@ public class UsersUseCaseConfig {
         return new PutUsersUseCaseImpl(gateway, emailAvailableUseCase,  findByIdUsersUseCase);
     }
 
+    @Bean
+    public PatchPassUseCase patchPassUseCase(PatchPassUsersGateway gateway,
+                                             FindByIdUsersUseCase findByIdUsersUseCase,
+                                             PassAvailableUseCase passAvailableUseCase) {
+
+        return new PatchPassUseCaseImpl(findByIdUsersUseCase,gateway, passAvailableUseCase);
+    }
+
+    @Bean
+    public PassAvailableUseCase passAvailableUseCase(PassAvailableGatway gateway) {
+        return new PassAvilableUseCaseImpl(gateway);
+    }
+
+
 }
