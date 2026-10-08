@@ -1,6 +1,6 @@
-package br.costa.DevJobs.infrastructure.config;
+package br.costa.DevJobs.infrastructure.service.userservice;
 
-import br.costa.DevJobs.infrastructure.dto.response.UserResponseFindByIdDto;
+import br.costa.DevJobs.infrastructure.dto.response.userresponse.UserResponseFindByIdDto;
 import br.costa.DevJobs.usecase.userusecase.FindAllUsersUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class FindAllConfig {
+public class FindAllService {
 
     private final FindAllUsersUseCase findAllUsersUseCase;
 
