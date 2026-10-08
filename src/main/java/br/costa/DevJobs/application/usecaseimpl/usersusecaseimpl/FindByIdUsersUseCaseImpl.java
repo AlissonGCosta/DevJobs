@@ -2,7 +2,7 @@ package br.costa.DevJobs.application.usecaseimpl.usersusecaseimpl;
 
 import br.costa.DevJobs.application.gateway.usersgateway.FindByIdGateway;
 import br.costa.DevJobs.core.domain.Users;
-import br.costa.DevJobs.core.exception.IdFoundAvailableException;
+import br.costa.DevJobs.core.exception.usersexception.IdFoundAvailableException;
 import br.costa.DevJobs.core.exception.enums.ErrorCodeEnum;
 import br.costa.DevJobs.usecase.userusecase.FindByIdUsersUseCase;
 import br.costa.DevJobs.usecase.userusecase.IdAvailableUseCase;
