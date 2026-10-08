@@ -1,4 +1,4 @@
-package br.costa.DevJobs.core.exception;
+package br.costa.DevJobs.core.exception.usersexception;
 
 public class EmailAvaliableException extends RuntimeException {
 
