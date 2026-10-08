@@ -1,4 +1,4 @@
-package br.costa.DevJobs.infrastructure.dto.response;
+package br.costa.DevJobs.infrastructure.dto.response.userresponse;
 
 import java.time.Instant;
 
