@@ -4,13 +4,15 @@ Registro das alterações que estavam pendentes na branch `master`, a partir do 
 
 Nesta organização, o código Java recebido foi preservado, as alterações foram commitadas individualmente e a documentação foi atualizada. A verificação encontrou um erro de compilação já presente nas alterações, detalhado abaixo.
 
+Referência atualizada em 08/10/2026: a tabela abaixo usa o nome atual `FindAllService`, que substituiu `FindAllConfig` nesta nova etapa. Os resultados de compilação e os commits deste registro continuam correspondendo à entrega de 30/09/2026. A reorganização está detalhada no [registro de 08/10/2026](atualizacao-2026-10-08.md).
+
 ## O que mudou
 
 | Área | Alterações desta etapa |
 | --- | --- |
 | Domínio | Construtor de `Users` com nome e e-mail para transportar dados de atualização. |
 | Organização | Quatro implementações migradas de `usersusecase` para `usersusecaseimpl`; `IdAvailableException` renomeada para `IdFoundAvailableException`. |
-| Listagem | Contratos `FindAllUsersGateway` e `FindAllUsersUseCase`, implementação `FindAllUsersCaseImpl`, serviço JPA e conversão para DTO em `FindAllConfig`. |
+| Listagem | Contratos `FindAllUsersGateway` e `FindAllUsersUseCase`, implementação `FindAllUsersCaseImpl`, serviço JPA e conversão para DTO em `FindAllService`. |
 | Atualização | Contratos de gateway e caso de uso, carregamento do usuário, verificação de e-mail, atualização de nome/e-mail/data e persistência transacional. |
 | API | `GET /v1/users` e `PUT /v1/users/{id}`, DTOs próprios para atualização e validação dos corpos de cadastro e atualização. |
 | Senhas | Bean `BCryptPasswordEncoder` e geração de hashes de senha e confirmação no mapeamento de cadastro para entidade. |
