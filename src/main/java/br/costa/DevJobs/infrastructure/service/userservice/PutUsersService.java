@@ -1,8 +1,8 @@
-package br.costa.DevJobs.infrastructure.service;
+package br.costa.DevJobs.infrastructure.service.userservice;
 
 import br.costa.DevJobs.application.gateway.usersgateway.PutUsersGateway;
 import br.costa.DevJobs.core.domain.Users;
-import br.costa.DevJobs.core.exception.IdFoundAvailableException;
+import br.costa.DevJobs.core.exception.usersexception.IdFoundAvailableException;
 import br.costa.DevJobs.core.exception.enums.ErrorCodeEnum;
 import br.costa.DevJobs.infrastructure.mappers.UserMapper;
 import br.costa.DevJobs.infrastructure.persistence.UsersRepository;
