@@ -1,4 +1,4 @@
-package br.costa.DevJobs.infrastructure.dto.request;
+package br.costa.DevJobs.infrastructure.dto.request.userrequest;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
