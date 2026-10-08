@@ -47,10 +47,10 @@ public class UsersUseCaseConfig {
 
     @Bean
     public PatchPassUseCase patchPassUseCase(PatchPassUsersGateway gateway,
-                                             FindByIdUsersUseCase findByIdUsersUseCase,
+                                             IdAvailableUseCase idAvailableUseCase,
                                              PassAvailableUseCase passAvailableUseCase) {
 
-        return new PatchPassUseCaseImpl(findByIdUsersUseCase,gateway, passAvailableUseCase);
+        return new PatchPassUseCaseImpl(idAvailableUseCase,gateway, passAvailableUseCase);
     }
 
     @Bean
@@ -58,5 +58,10 @@ public class UsersUseCaseConfig {
         return new PassAvilableUseCaseImpl(gateway);
     }
 
+    @Bean
+    public DeleteUserUseCase deleteUserUseCase(DeleteUserGateway gateway,
+                                               IdAvailableUseCase useCase) {
+        return new DeleteUserUseCaseImpl(gateway, useCase);
+    }
 
 }
