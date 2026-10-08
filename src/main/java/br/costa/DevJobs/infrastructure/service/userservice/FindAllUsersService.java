@@ -1,4 +1,4 @@
-package br.costa.DevJobs.infrastructure.service;
+package br.costa.DevJobs.infrastructure.service.userservice;
 
 import br.costa.DevJobs.application.gateway.usersgateway.FindAllUsersGateway;
 import br.costa.DevJobs.core.domain.Users;
