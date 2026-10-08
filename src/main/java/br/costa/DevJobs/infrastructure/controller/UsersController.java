@@ -1,12 +1,12 @@
 package br.costa.DevJobs.infrastructure.controller;
 
-import br.costa.DevJobs.infrastructure.config.FindAllConfig;
-import br.costa.DevJobs.infrastructure.dto.request.PatchUserPassRequestDto;
-import br.costa.DevJobs.infrastructure.dto.request.PutUserRequestDto;
-import br.costa.DevJobs.infrastructure.dto.request.UsersRequestDto;
-import br.costa.DevJobs.infrastructure.dto.response.PutUserResponseDto;
-import br.costa.DevJobs.infrastructure.dto.response.UserResponseFindByIdDto;
-import br.costa.DevJobs.infrastructure.dto.response.UsersResponseDto;
+import br.costa.DevJobs.infrastructure.service.userservice.FindAllService;
+import br.costa.DevJobs.infrastructure.dto.request.userrequest.PatchUserPassRequestDto;
+import br.costa.DevJobs.infrastructure.dto.request.userrequest.PutUserRequestDto;
+import br.costa.DevJobs.infrastructure.dto.request.userrequest.UsersRequestDto;
+import br.costa.DevJobs.infrastructure.dto.response.userresponse.PutUserResponseDto;
+import br.costa.DevJobs.infrastructure.dto.response.userresponse.UserResponseFindByIdDto;
+import br.costa.DevJobs.infrastructure.dto.response.userresponse.UsersResponseDto;
 import br.costa.DevJobs.infrastructure.mappers.UserMapper;
 import br.costa.DevJobs.usecase.userusecase.*;
 import jakarta.validation.Valid;
@@ -27,10 +27,11 @@ public class UsersController {
     private final FindByIdUsersUseCase findByIdUsersUseCase;
     private final PutUsersUseCase putUsersUseCase;
     private final PatchPassUseCase patchPassUseCase;
+    private final DeleteUserUseCase deleteUserUseCase;
 
 
     private final UserMapper userMapper;
-    private final FindAllConfig  findAllConfig;
+    private final FindAllService findAllService;
 
 
     @PostMapping
@@ -49,7 +50,7 @@ public class UsersController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<UserResponseFindByIdDto> findAll() {
-        return findAllConfig.findAll();
+        return findAllService.findAll();
     }
 
     @PutMapping("/{id}")
@@ -62,7 +63,13 @@ public class UsersController {
     @ResponseStatus(HttpStatus.OK)
     public void updatePass(@PathVariable Long id, @RequestBody @Valid PatchUserPassRequestDto dto) {
 
-        patchPassUseCase.patchPass(userMapper.patchPassRequestToUsers(dto), id);
+        patchPassUseCase.patchPass(dto.oldPassword(),dto.newPassword(), dto.confirmNewPassword(), id);
 
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Long id) {
+        deleteUserUseCase.delete(id);
     }
 }
