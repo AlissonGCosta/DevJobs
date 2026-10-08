@@ -12,8 +12,8 @@ public class PassAvilableUseCaseImpl implements PassAvailableUseCase {
     }
 
     @Override
-    public Boolean availablePass(String oldPassword, Long id) {
+    public void availablePass(String oldPassword, Long id) {
 
-        return passAvailableGatway.availablePass(oldPassword, id);
+        passAvailableGatway.availablePass(oldPassword, id);
     }
 }
