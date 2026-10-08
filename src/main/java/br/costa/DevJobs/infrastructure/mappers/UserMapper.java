@@ -3,12 +3,12 @@ package br.costa.DevJobs.infrastructure.mappers;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.infrastructure.Entity.UsersEntity;
 import br.costa.DevJobs.infrastructure.config.PasswordConfig;
-import br.costa.DevJobs.infrastructure.dto.request.PatchUserPassRequestDto;
-import br.costa.DevJobs.infrastructure.dto.request.PutUserRequestDto;
-import br.costa.DevJobs.infrastructure.dto.request.UsersRequestDto;
-import br.costa.DevJobs.infrastructure.dto.response.PutUserResponseDto;
-import br.costa.DevJobs.infrastructure.dto.response.UserResponseFindByIdDto;
-import br.costa.DevJobs.infrastructure.dto.response.UsersResponseDto;
+import br.costa.DevJobs.infrastructure.dto.request.userrequest.PatchUserPassRequestDto;
+import br.costa.DevJobs.infrastructure.dto.request.userrequest.PutUserRequestDto;
+import br.costa.DevJobs.infrastructure.dto.request.userrequest.UsersRequestDto;
+import br.costa.DevJobs.infrastructure.dto.response.userresponse.PutUserResponseDto;
+import br.costa.DevJobs.infrastructure.dto.response.userresponse.UserResponseFindByIdDto;
+import br.costa.DevJobs.infrastructure.dto.response.userresponse.UsersResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -25,19 +25,6 @@ public class UserMapper {
                 dto.email(),
                 dto.password(),
                 dto.confirmPassword()
-        );
-    }
-
-    public UsersEntity userDomaintoUsersEntity(Users user) {
-        return new UsersEntity(
-                user.getFullName(),
-                user.getEmail(),
-                passwordConfig.passwordEncoder().encode(user.getPassword()),
-                passwordConfig.passwordEncoder().encode(user.getConfirmPassword()),
-                user.getRole(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getAttempt()
         );
     }
 
