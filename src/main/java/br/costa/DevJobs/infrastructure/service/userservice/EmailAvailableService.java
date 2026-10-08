@@ -1,4 +1,4 @@
-package br.costa.DevJobs.infrastructure.service;
+package br.costa.DevJobs.infrastructure.service.userservice;
 
 import br.costa.DevJobs.application.gateway.usersgateway.EmailAvailableGateway;
 import br.costa.DevJobs.infrastructure.persistence.UsersRepository;
