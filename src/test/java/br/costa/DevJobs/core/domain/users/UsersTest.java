@@ -1,8 +1,8 @@
 package br.costa.DevJobs.core.domain.users;
 
 import br.costa.DevJobs.core.domain.Users;
-import br.costa.DevJobs.core.exception.InvalidPasswordException;
-import br.costa.DevJobs.core.exception.ValidateFullNameException;
+import br.costa.DevJobs.core.exception.usersexception.InvalidPasswordException;
+import br.costa.DevJobs.core.exception.usersexception.ValidateFullNameException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
