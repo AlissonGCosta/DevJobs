@@ -1,4 +1,4 @@
-package br.costa.DevJobs.infrastructure.service;
+package br.costa.DevJobs.infrastructure.service.userservice;
 
 import br.costa.DevJobs.application.gateway.usersgateway.RegisterUserGateway;
 import br.costa.DevJobs.core.domain.Users;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 public class UserRegisterService  implements RegisterUserGateway {
 
     private final UsersRepository usersRepository;
-    private final UserMapper userMapper;
+    private final CreateUserEntityService createUserEntityService;
 
 
     @Override
     public Boolean registerUser(Users user) {
         try{
-            usersRepository.save(userMapper.userDomaintoUsersEntity(user));
+            usersRepository.save(createUserEntityService.userDomaintoUsersEntity(user));
             return true;
         }catch(Exception e){
             return  false;
