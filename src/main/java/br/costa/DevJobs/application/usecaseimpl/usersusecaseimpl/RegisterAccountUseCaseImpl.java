@@ -2,8 +2,8 @@ package br.costa.DevJobs.application.usecaseimpl.usersusecaseimpl;
 
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.application.gateway.usersgateway.RegisterUserGateway;
-import br.costa.DevJobs.core.exception.EmailAvaliableException;
-import br.costa.DevJobs.core.exception.InternalServerErrorException;
+import br.costa.DevJobs.core.exception.usersexception.EmailAvaliableException;
+import br.costa.DevJobs.core.exception.usersexception.InternalServerErrorException;
 import br.costa.DevJobs.core.exception.enums.ErrorCodeEnum;
 import br.costa.DevJobs.usecase.userusecase.EmailAvailableUseCase;
 import br.costa.DevJobs.usecase.userusecase.RegisterAccountUseCase;
