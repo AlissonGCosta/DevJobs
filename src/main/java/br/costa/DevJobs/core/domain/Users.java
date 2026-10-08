@@ -1,8 +1,9 @@
 package br.costa.DevJobs.core.domain;
 
 import br.costa.DevJobs.core.domain.enumerated.enumuser.UserRoleEnum;
-import br.costa.DevJobs.core.exception.InvalidPasswordException;
-import br.costa.DevJobs.core.exception.ValidateFullNameException;
+import br.costa.DevJobs.core.exception.usersexception.InvalidPasswordException;
+import br.costa.DevJobs.core.exception.usersexception.PassAvailableException;
+import br.costa.DevJobs.core.exception.usersexception.ValidateFullNameException;
 import br.costa.DevJobs.core.exception.enums.ErrorCodeEnum;
 
 import java.time.Instant;
@@ -174,7 +175,7 @@ public class Users {
 
     private void validateEqualsPassword(String confirmPassword) {
         if(!confirmPassword.equals(getPassword())) {
-            throw new InvalidPasswordException(ErrorCodeEnum.IPN0002.getMessage(), ErrorCodeEnum.IPN0002.getCode());
+            throw new PassAvailableException(ErrorCodeEnum.IPN0002.getMessage(), ErrorCodeEnum.IPN0002.getCode());
         }
 
         this.confirmPassword = confirmPassword;
