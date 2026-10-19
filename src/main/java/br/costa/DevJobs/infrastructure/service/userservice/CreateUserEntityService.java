@@ -1,5 +1,6 @@
 package br.costa.DevJobs.infrastructure.service.userservice;
 
+import br.costa.DevJobs.application.persistence.user.PostUserPersistence;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.infrastructure.Entity.UsersEntity;
 import br.costa.DevJobs.infrastructure.config.PasswordConfig;
@@ -12,16 +13,15 @@ public class CreateUserEntityService {
 
     private final PasswordConfig passwordConfig;
 
-    public UsersEntity userDomaintoUsersEntity(Users user) {
+    public UsersEntity PostPersistenctoUsersEntity(PostUserPersistence user) {
         return new UsersEntity(
-                user.getFullName(),
-                user.getEmail(),
-                passwordConfig.passwordEncoder().encode(user.getPassword()),
-                passwordConfig.passwordEncoder().encode(user.getConfirmPassword()),
-                user.getRole(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getAttempt()
+                user.fullName(),
+                user.email(),
+                passwordConfig.passwordEncoder().encode(user.password()),
+                user.role(),
+                user.createdAt(),
+                user.updatedAt(),
+                user.attempts()
         );
     }
 }
