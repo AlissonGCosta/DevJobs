@@ -1,73 +1,116 @@
 # DevJobs
 
-Projeto de back-end para organizar vagas, candidaturas e entrevistas de emprego, desenvolvido com Java e Spring Boot.
+Back-end em Java e Spring Boot para organizar vagas de emprego, candidaturas e entrevistas.
 
-**Estado documentado em 08/10/2026:** o código inclui cadastro, consulta por ID, listagem, atualização de perfil, troca de senha e exclusão de usuários. Esta etapa reorganiza os pacotes de usuários, amplia o tratamento HTTP das exceções e passa a consultar e atualizar a senha diretamente na entidade persistida. A compilação passou; a suíte executou sete testes, com uma falha por divergência no tipo de exceção esperado. O PATCH ainda tem pendências de validação e tratamento de falhas, descritas abaixo.
+**Estado em 19/10/2026:** a API de usuários possui cadastro, consulta, listagem, atualização de perfil, troca de senha e exclusão. Os fluxos passaram a usar records de comando, persistência e resultado. A confirmação de senha deixou de fazer parte da entidade JPA, e as respostas de cadastro e atualização passaram a incluir o ID. A compilação passou; os sete testes executados tiveram uma falha já registrada na etapa anterior. Há inconsistências no fluxo de atualização de perfil, detalhadas abaixo.
 
-O [planejamento original](DevJobs-Projeto.md) descreve o produto desejado. Os registros de [18/09/2026](docs/atualizacao-2026-09-18.md), [30/09/2026](docs/atualizacao-2026-09-30.md), [04/10/2026](docs/atualizacao-2026-10-04.md) e [08/10/2026](docs/atualizacao-2026-10-08.md) documentam as respectivas etapas.
+O [planejamento original](DevJobs-Projeto.md) descreve o produto desejado. O [registro de 19/10/2026](docs/atualizacao-2026-10-19.md) apresenta as mudanças desta etapa, as limitações identificadas e os commits por arquivo. Etapas anteriores: [18/09](docs/atualizacao-2026-09-18.md), [30/09](docs/atualizacao-2026-09-30.md), [04/10](docs/atualizacao-2026-10-04.md) e [08/10](docs/atualizacao-2026-10-08.md).
 
-## Tecnologias presentes
+## Tecnologias
 
-| Tecnologia | Uso no código atual |
+| Tecnologia | Uso atual |
 | --- | --- |
-| Java 21 | Versão de compilação configurada no `pom.xml`. |
+| Java 21 | Versão de compilação definida no `pom.xml`. |
 | Spring Boot 4.1.0 | Inicialização e configuração da aplicação. |
 | Maven Wrapper 3.9.16 | Build, testes e execução. |
-| Spring Web MVC | Controller REST de usuários. |
-| Spring Data JPA | `UsersEntity`, `UsersRepository` e serviços de persistência. |
-| Spring Security | Configuração permissiva de desenvolvimento e `BCryptPasswordEncoder`. |
-| Bean Validation | `@Valid` nas entradas do controller e `@NotNull` nos DTOs de cadastro, atualização de perfil e troca de senha. |
-| H2 e PostgreSQL | H2 em memória configurado; driver PostgreSQL disponível, sem conexão configurada. |
-| Flyway | Dependência presente, desabilitada na configuração local; sem migrações do projeto. |
+| Spring Web MVC | API REST de usuários. |
+| Spring Data JPA | Entidade de usuários, repository e persistência. |
+| Spring Security | Configuração permissiva de desenvolvimento e BCrypt. |
+| Bean Validation | `@Valid` no controller e `@NotNull` nos DTOs de entrada. |
+| H2 | Banco em memória configurado para desenvolvimento. |
+| PostgreSQL e Flyway | Dependências presentes; conexão PostgreSQL e migrações ainda pendentes. Flyway desabilitado localmente. |
 | Lombok | Construtores, getters e setters da infraestrutura. |
-| JUnit Jupiter | Seis testes de domínio e um teste de contexto definidos. |
+| JUnit Jupiter | Seis testes de domínio e um de contexto Spring. |
+
+## Execução local
+
+Use JDK 21 ou superior compatível com o projeto. O Maven compila com `release 21`; a verificação desta entrega usou Java 25.0.2. Configure `JAVA_HOME` ou disponibilize `java` no `PATH`.
+
+No Windows, na raiz do projeto:
+
+```powershell
+.\mvnw.cmd test -B -ntp
+.\mvnw.cmd spring-boot:run
+```
+
+No Linux ou macOS:
+
+```bash
+./mvnw test -B -ntp
+./mvnw spring-boot:run
+```
+
+O wrapper baixa o Maven e as dependências quando necessário. A aplicação usa a porta padrão `8080`, sem personalização no projeto.
+
+| Configuração local | Valor |
+| --- | --- |
+| JDBC | `jdbc:h2:mem:devjobs;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE` |
+| Usuário / senha | `sa` / vazia |
+| Console H2 | `http://localhost:8080/h2-console` |
+| Hibernate | `ddl-auto: update` |
+| Flyway | `enabled: false` |
+
+Os dados do H2 não sobrevivem ao encerramento do processo. A configuração Spring Security permite todas as requisições e desabilita CSRF. Autenticação própria, JWT e autorização por usuário continuam pendentes.
 
 ## Organização do código
 
 ```text
 src/main/java/br/costa/DevJobs/
-├── DevJobsApplication.java
-├── core/
-│   ├── domain/
-│   │   └── enumerated/
-│   └── exception/
-│       ├── enums/
-│       └── usersexception/
-├── usecase/userusecase/
-├── application/
-│   ├── gateway/usersgateway/
-│   └── usecaseimpl/usersusecaseimpl/
-└── infrastructure/
-    ├── Entity/
-    ├── config/
-    ├── controller/
-    ├── dto/
-    │   ├── request/userrequest/
-    │   └── response/userresponse/
-    ├── exception/
-    ├── mappers/
-    ├── persistence/
-    └── service/userservice/
+|-- DevJobsApplication.java
+|-- core/
+|   |-- domain/
+|   |   `-- enumerated/
+|   `-- exception/
+|       |-- enums/
+|       `-- usersexception/
+|-- usecase/userusecase/
+|-- application/
+|   |-- command/users/
+|   |-- persistence/user/
+|   |-- result/users/
+|   |-- gateway/usersgateway/
+|   `-- usecaseimpl/usersusecaseimpl/
+`-- infrastructure/
+    |-- Entity/
+    |-- config/
+    |-- controller/
+    |-- dto/
+    |   |-- request/userrequest/
+    |   `-- response/userresponse/
+    |-- exception/
+    |-- mappers/
+    |-- persistence/
+    `-- service/userservice/
 ```
 
-O domínio usa classes Java sem anotações JPA. Os casos de uso recebem gateways pelo construtor; os serviços de infraestrutura implementam esses contratos com o repository. `UsersUseCaseConfig` compõe os casos de uso, e `UserMapper` é um componente Spring responsável pelas conversões de DTOs e domínio. `CreateUserEntityService` cria a entidade de cadastro e gera os hashes BCrypt. `FindAllService`, antes chamado `FindAllConfig`, converte a listagem para DTOs no pacote de serviços de usuários.
+O fluxo de escrita segue DTO de entrada -> `UserMapper` -> comando -> caso de uso -> modelo de persistência -> gateway -> serviço JPA. As leituras e os retornos das escritas usam resultados da aplicação, convertidos para DTOs de resposta. A troca de senha usa um comando e um gateway sem retorno; a exclusão continua recebendo apenas o ID.
 
-Os modelos de vaga (`JobVacancy`), candidatura (`JobApplication`), entrevista (`Interview`) e histórico (`HistoryJobApplication`) também estão presentes. Seus fluxos completos de API e persistência continuam pendentes.
+| Grupo | Records presentes |
+| --- | --- |
+| Comandos | `RegisterUserRequestCommand`, `UpdateUserCommand`, `PatchUserPassCommand`. |
+| Persistência | `PostUserPersistence`, `UpdateUserPersistence`. |
+| Resultados | `RegisterUserResult`, `UpdateUserResult`, `UserDetailsResult`, `FindAllUsersResult`. |
+
+O domínio permanece sem anotações JPA. `UsersUseCaseConfig` compõe os casos de uso com gateways. `CreateUserEntityService` transforma os dados de cadastro em `UsersEntity` e gera o hash BCrypt da senha. `confirmPassword` continua na entrada e no domínio para validação, mas não está em `PostUserPersistence` nem em `UsersEntity`.
+
+A listagem do controller chama `FindAllUsersUseCase` e mapeia `FindAllUsersResult` para `FindAllResponseDto`. O componente intermediário `FindAllService` foi removido, assim como suas referências no controller. A camada `usecase` importa os records de `application`; essa é a dependência presente no código atual.
+
+Os modelos de vaga (`JobVacancy`), candidatura (`JobApplication`), entrevista (`Interview`) e histórico (`HistoryJobApplication`) estão presentes no domínio. Seus fluxos completos de API e persistência permanecem pendentes.
 
 ## API de usuários
 
-As rotas abaixo estão declaradas em [UsersController](src/main/java/br/costa/DevJobs/infrastructure/controller/UsersController.java), com base `/v1/users`. Os status representam o contrato declarado; os endpoints não foram exercitados via HTTP nesta verificação.
+Base: `http://localhost:8080/v1/users`. Os contratos abaixo vêm de [UsersController](src/main/java/br/costa/DevJobs/infrastructure/controller/UsersController.java). Os endpoints não foram exercitados via HTTP nesta entrega; a atualização possui as inconsistências descritas após a tabela.
 
-| Método e rota | Entrada | Resposta de sucesso declarada |
+| Método e rota | Entrada | Sucesso declarado |
 | --- | --- | --- |
-| `POST /v1/users` | `fullName`, `email`, `password`, `confirmPassword` | `201`: nome e e-mail. |
-| `GET /v1/users/{id}` | ID no caminho | `200`: ID, nome, e-mail, criação e perfil. |
-| `GET /v1/users` | Sem corpo | `200`: lista com os mesmos campos da consulta por ID. |
-| `PUT /v1/users/{id}` | ID no caminho; `fullName` e `email` no corpo | `200`: nome, e-mail e `updatedAt`. |
-| `PATCH /v1/users/{id}` | ID no caminho; `oldPassword`, `newPassword` e `confirmNewPassword` no corpo | `200`, sem corpo; implementação com pendências descritas em “Troca de senha”. |
+| `POST /v1/users` | `fullName`, `email`, `password`, `confirmPassword` | `201`: `id`, `fullName`, `email`. |
+| `GET /v1/users/{id}` | ID no caminho | `200`: `id`, `fullName`, `email`, `createdAt`, `role`. |
+| `GET /v1/users` | Sem corpo | `200`: lista com os mesmos campos da consulta por ID, sem paginação. |
+| `PUT /v1/users/{id}` | ID; `fullName`, `email` no corpo | `200`: `id`, `fullName`, `email`, `updatedAt`. |
+| `PATCH /v1/users/{id}` | ID; `oldPassword`, `newPassword`, `confirmNewPassword` no corpo | `200`, sem corpo. |
 | `DELETE /v1/users/{id}` | ID no caminho, sem corpo | `204`, sem corpo. |
 
-Exemplo de corpo de cadastro:
+### Cadastro
 
 ```json
 {
@@ -78,7 +121,11 @@ Exemplo de corpo de cadastro:
 }
 ```
 
-Exemplo de corpo de atualização:
+`RegisterAccountUseCaseImpl` constrói `Users` para validar nome, senha e confirmação, verifica se o e-mail já existe e cria `PostUserPersistence`. O gateway retorna `RegisterUserResult` com o ID atribuído à entidade e os dados do cadastro. A resposta passa a vir do resultado da persistência. O nome `emailAvailable` corresponde a uma consulta `existsByEmail`: `true` indica e-mail já cadastrado.
+
+`UserRegisterService` não captura mais qualquer exceção para retornar `false`. Falhas de persistência se propagam; o caso de uso não converte um retorno booleano em `InternalServerErrorException`.
+
+### Atualização de perfil
 
 ```json
 {
@@ -87,17 +134,11 @@ Exemplo de corpo de atualização:
 }
 ```
 
-O cadastro verifica a existência do e-mail antes de persistir. Embora o método se chame `emailAvailable`, o serviço usa `existsByEmail`: `true` indica e-mail já cadastrado. `UserRegisterService` delega a criação da entidade a `CreateUserEntityService`, que gera hashes BCrypt separados para senha e confirmação; esses campos não aparecem nos DTOs de resposta.
+O caso de uso consulta o usuário, reconstrói o domínio e valida o nome pelo setter. A verificação de duplicidade só ocorre quando o novo e-mail difere do atual, permitindo passar pela verificação com o próprio e-mail. `PutUsersService` altera a entidade em método transacional e atualiza `updatedAt`.
 
-A consulta por ID verifica a existência do usuário. A listagem usa `findAll` do repository e converte os resultados para DTOs por meio de `FindAllService`, sem paginação.
-
-A atualização carrega o usuário, verifica o e-mail, altera nome, e-mail e data de atualização e salva a entidade em um serviço transacional. No código atual, enviar o próprio e-mail já cadastrado também dispara `EmailAvaliableException`; ainda não há uma exceção à verificação de duplicidade para o titular.
-
-A exclusão passa por `DeleteUserUseCaseImpl`, que verifica a existência do ID e lança `IdFoundAvailableException` quando ele não existe. `DeleteUserService` chama `UsersRepository.deleteById` em um método transacional. O controller declara HTTP `204` no sucesso; a exceção de ID ausente é tratada como `404`.
+**Pendências identificadas por leitura do código:** `UpdateUserPersistence` declara os campos na ordem `email, fullName`, mas o caso de uso fornece `fullName, email`. O serviço usa os accessors do record, portanto recebe nome e e-mail invertidos para gravação. As conversões entre entidade, `UpdateUserResult` e DTO também têm inversões de posição; o mapper preenche `updatedAt` com `createdAt`. Não se deve considerar o fluxo de atualização validado apenas pelo sucesso da compilação. O [registro desta etapa](docs/atualizacao-2026-10-19.md) detalha cada conversão.
 
 ### Troca de senha
-
-Exemplo do corpo aceito por `PATCH /v1/users/{id}`:
 
 ```json
 {
@@ -107,32 +148,26 @@ Exemplo do corpo aceito por `PATCH /v1/users/{id}`:
 }
 ```
 
-`PatchUserPassRequestDto` exige os três campos não nulos. O controller agora passa as três strings diretamente para `PatchPassUseCase`, sem chamar `UserMapper.patchPassRequestToUsers`. Esse método do mapper e o construtor de domínio de troca de senha continuam presentes, mas suas validações não são executadas no caminho atual do endpoint.
+1. O controller valida os campos não nulos e cria `PatchUserPassCommand`.
+2. O caso de uso verifica a existência do ID e confere a senha antiga contra o hash persistido por BCrypt.
+3. O caso de uso compara `newPassword` e `confirmNewPassword`; divergência lança `PassAvailableException`, tratada como HTTP `409`.
+4. O gateway recebe somente a nova senha e o ID. O serviço carrega a entidade, grava um hash BCrypt, atualiza `updatedAt` e salva.
 
-`PatchPassUseCaseImpl` verifica a existência do ID, chama `PassAvailableUseCase.availablePass(oldPassword, id)` e delega as novas senhas a `PatchPassUsersGateway`. A conferência retorna `void` e sinaliza falhas por exceção. `PassAvailableService` consulta `UsersRepository.findById` e compara a senha antiga com o hash da entidade via BCrypt; uma divergência lança `PassAvailableException`, tratada como HTTP `409`, interrompendo o fluxo. `PatchPasswordUserService` carrega a entidade existente, substitui os hashes de senha e confirmação e chama `save`. Os casos de uso são registrados em `UsersUseCaseConfig`.
+O serviço não captura mais qualquer exceção para retornar `false`; falhas interrompem o fluxo. A confirmação não é persistida. A validação de tamanho entre 8 e 64 caracteres do domínio ainda não é chamada pelo PATCH. O serviço também não declara uma transação que englobe a consulta e a gravação.
 
-**Pendências identificadas pela leitura do código:**
+### Exclusão
 
-- O caminho atual não verifica o tamanho da nova senha nem a igualdade entre `newPassword` e `confirmNewPassword`: ambos os valores são codificados e atribuídos diretamente à entidade. A Bean Validation exige somente que não sejam nulos.
-- `PatchPasswordUserService` ainda captura qualquer exceção e retorna `false`; o caso de uso ignora esse retorno. O controller pode terminar com HTTP `200` mesmo sem ter alterado a senha.
-- O serviço de troca de senha não atualiza `updatedAt` nem declara uma transação que englobe a consulta e a gravação.
-- Não há testes específicos do fluxo de senha, dos endpoints ou da exclusão de usuários.
-
-O acesso ao hash armazenado, a interrupção após senha antiga incorreta e o uso da entidade existente foram ajustados nesta etapa. As pendências acima foram identificadas por leitura do código; os endpoints não foram exercitados via HTTP nesta entrega.
+`DeleteUserUseCaseImpl` verifica a existência do ID e delega ao gateway. `DeleteUserService` executa `deleteById` em método transacional. ID ausente lança `IdFoundAvailableException`, tratada como HTTP `404`.
 
 ## Validações e erros
 
-O construtor de cadastro é `Users(String fullName, String email, String password, String confirmPassword)`.
-
-| Campo | Regra de domínio | Exceção e código |
+| Regra de domínio | Uso atual | Exceção |
 | --- | --- | --- |
-| Nome completo | Entre 6 e 100 caracteres. | `ValidateFullNameException`, `VPN0001`. |
-| Senha | Entre 8 e 64 caracteres. | `InvalidPasswordException`, `IPN0001`. |
-| Confirmação | Igual à senha. | `PassAvailableException`, `IPN0002`. |
+| Nome entre 6 e 100 caracteres | Cadastro e setter usado na atualização. | `ValidateFullNameException`, código `VPN0001`. |
+| Senha entre 8 e 64 caracteres | Cadastro; não aplicada pelo fluxo atual do PATCH. | `InvalidPasswordException`, código `IPN0001`. |
+| Confirmação igual à senha | Cadastro pelo domínio; PATCH por comparação no caso de uso. | `PassAvailableException`: código `IPN0002` no cadastro e `PSS0001` no PATCH. |
 
-Os DTOs exigem campos não nulos, mas não usam `@NotBlank` ou validação de formato de e-mail. Não há normalização de espaços. O construtor de dois argumentos usado para transportar a atualização apenas atribui nome e e-mail; o nome é validado posteriormente pelo setter do usuário carregado. O construtor de troca de senha reaplica as regras de senha e confirmação, sem validar por conta própria a senha antiga, mas não é chamado pelo PATCH atual.
-
-`GlobalExceptionHandler` responde com `timestamp`, `status`, `erro`, `message`, `path` e `errors`. Os tratamentos próprios mantêm `errors` nulo; o record `Error` prepara a estrutura para detalhes por campo, mas ainda não é preenchido por esse handler. O código da exceção também não aparece no corpo dessa resposta.
+Os DTOs de entrada exigem campos não nulos, sem `@NotBlank` ou validação de formato de e-mail. Não há normalização de espaços. `GlobalExceptionHandler` produz `timestamp`, `status`, `erro`, `message`, `path` e `errors`; os handlers atuais deixam `errors` nulo e não expõem o código da exceção.
 
 | Exceção tratada | HTTP |
 | --- | --- |
@@ -143,61 +178,29 @@ Os DTOs exigem campos não nulos, mas não usam `@NotBlank` ou validação de fo
 | `InvalidPasswordException` | `400` |
 | `ValidateFullNameException` | `400` |
 
-A confirmação divergente no cadastro agora lança `PassAvailableException` e é tratada como `409`. As respostas de Bean Validation ainda não são padronizadas pelo handler próprio.
+O handler de `InternalServerErrorException` permanece, embora o cadastro não lance mais essa exceção a partir de um booleano. Exceções de persistência propagadas não têm tratamento específico nesse handler. As respostas de Bean Validation também não são padronizadas por ele.
 
-| Constante | Código definido no enum | Uso |
-| --- | --- | --- |
-| `IAI0001` | `IAI0001` | Usuário não encontrado. |
-| `IAI0002` | `IAI0002` | ID já existente; definido, sem uso no fluxo atual. |
-| `EAA0001` | `CML0001` | E-mail já cadastrado. |
-| `EAA0002` | `CML0002` | E-mail não encontrado; definido, sem uso no fluxo atual. |
-| `ISE0001` | `ISE0001` | Falha sinalizada pelo gateway de cadastro. |
-| `PSE0001` | `PSS0001` | Senha antiga divergente; usado em `PassAvailableException`, propagada pelo serviço e tratada como HTTP `409`. |
-| `PIN0002` | `PIN-0002` | Mensagem de PIN com tentativas; fluxo de autenticação pendente. |
+## Verificação em 19/10/2026
 
-## Execução local
+Comando final: `.\mvnw.cmd clean test -B -ntp`, com Java **25.0.2**, Maven **3.9.16** e compilação em **release 21**.
 
-Use JDK 21 e `JAVA_HOME` configurado. O wrapper baixa o Maven e as dependências quando necessário.
+**Resultado: BUILD FAILURE na etapa de testes; 7 executados, 1 falha, 0 erros e 0 ignorados.** A compilação dos 83 arquivos principais e dos dois arquivos de teste passou. `DevJobsApplicationTests.contextLoads` passou com H2.
 
-No Windows:
+O teste `UsersTest.shouldRejectdiferentPass` espera `InvalidPasswordException`, mas `Users.validateEqualsPassword` lança `PassAvailableException`. A mesma divergência foi registrada em 08/10; o teste permanece inalterado nesta entrega. Os relatórios estão em `target/surefire-reports`, ignorado pelo Git.
 
-```powershell
-.\mvnw.cmd test
-.\mvnw.cmd spring-boot:run
-```
-
-No Linux ou macOS:
-
-```bash
-./mvnw test
-./mvnw spring-boot:run
-```
-
-A API usa a porta padrão `8080`, sem porta personalizada no projeto. A configuração local usa `jdbc:h2:mem:devjobs;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE`, usuário `sa` e senha vazia. O console H2 fica em `/h2-console`, e o Hibernate gerencia as tabelas com `ddl-auto: update`. Os dados são temporários e não sobrevivem ao encerramento do processo.
-
-A configuração de segurança permite todas as requisições e desabilita CSRF. Há regras explícitas para `POST /v1/**`, `GET`, `PUT`, `PATCH` e agora `DELETE`, além de `anyRequest().permitAll()`. A inclusão de `DELETE` mantém o comportamento já permissivo. Autenticação própria, autorização por usuário e JWT permanecem pendentes.
-
-## Verificação
-
-Em **08/10/2026**, foi executado `.\mvnw.cmd test -B -ntp` com Java **25.0.2**, compilação configurada para Java 21 e Maven Wrapper **3.9.16**.
-
-Resultado: **BUILD FAILURE na etapa de testes**, com **7 testes executados, 1 falha, 0 erros e 0 ignorados**. A compilação principal e de testes passou, e `DevJobsApplicationTests.contextLoads` passou. O teste `UsersTest.shouldRejectdiferentPass` espera `InvalidPasswordException`, mas `Users.validateEqualsPassword` agora lança `PassAvailableException`. Esta entrega preserva o código Java recebido e registra essa divergência.
-
-A suíte contém seis casos em `UsersTest` (senha curta, senha longa, nome curto, nome longo, confirmação diferente e cadastro válido) e `DevJobsApplicationTests.contextLoads`. Não há testes específicos dos casos de uso, endpoints, persistência do PATCH ou exclusão. A inicialização do contexto confirma a composição Spring atual, sem validar os contratos HTTP ou os efeitos desses endpoints no banco.
-
-Os resultados históricos de 18/09, 30/09 e 04/10 estão preservados nos respectivos registros. As limitações descritas neste README foram identificadas por inspeção do código, sem execução dos endpoints nesta entrega.
+Não há testes específicos de casos de uso, mapeamento dos records, endpoints ou persistência desses fluxos. O teste de contexto confirma a composição Spring, sem validar os contratos HTTP. As pendências de mapeamento acima foram identificadas por inspeção estática. O ajuste feito no Java durante esta organização foi remover o import e a injeção do componente excluído `FindAllService` no controller.
 
 ## Próximas etapas
 
-- Alinhar o teste de confirmação divergente ao contrato de exceção pretendido pelo domínio.
-- Reaplicar no PATCH as validações de tamanho e confirmação da nova senha, propagar falhas de gravação e atualizar `updatedAt`.
-- Cobrir a troca de senha com testes de senha antiga incorreta, confirmação divergente, persistência bem-sucedida e falha de gravação.
-- Permitir atualização mantendo o e-mail do próprio usuário.
-- Completar testes de casos de uso, controller, persistência, exclusão e respostas de erro.
-- Padronizar as respostas de Bean Validation e ampliar as validações dos dados de entrada.
-- Implementar autenticação e autorização; revisar a persistência da confirmação de senha.
-- Configurar PostgreSQL e migrações, adicionar paginação e desenvolver os fluxos de vagas, candidaturas e entrevistas.
+- Corrigir a ordem de nome/e-mail em `UpdateUserPersistence` e nas conversões de `UpdateUserResult`; retornar a data de atualização real.
+- Alinhar o teste de confirmação divergente ao contrato de exceção definido pelo domínio.
+- Aplicar a validação de tamanho de senha no PATCH e revisar os limites transacionais desse fluxo.
+- Cobrir cadastro, atualização e troca de senha com testes de mapeamento, casos de uso e persistência.
+- Padronizar as respostas de Bean Validation e de falhas de persistência.
+- Revisar os componentes e imports sem uso após a refatoração.
+- Implementar autenticação, autorização, PostgreSQL, migrações e paginação.
+- Desenvolver os fluxos de vagas, candidaturas e entrevistas.
 
 ## Convenção dos commits
 
-As mensagens seguem `tipo(escopo): descrição`, com um commit dedicado por arquivo alterado ou criado. Uma renomeação reúne o caminho antigo e o novo do mesmo arquivo em um único commit. A relação de arquivos e commits desta entrega está no [registro de 08/10/2026](docs/atualizacao-2026-10-08.md).
+As mensagens seguem `tipo(escopo): descrição`, com um commit dedicado para cada arquivo alterado, criado ou excluído, inclusive documentação. Esta etapa reúne 39 caminhos Java, este README e um novo registro: **41 commits para 41 arquivos**. A relação está no [registro de 19/10/2026](docs/atualizacao-2026-10-19.md).
