@@ -1,6 +1,7 @@
 package br.costa.DevJobs.infrastructure.service.userservice;
 
 import br.costa.DevJobs.application.gateway.usersgateway.FindByIdGateway;
+import br.costa.DevJobs.application.result.users.UserDetailsResult;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.core.exception.usersexception.IdFoundAvailableException;
 import br.costa.DevJobs.core.exception.enums.ErrorCodeEnum;
@@ -18,11 +19,17 @@ public class FindByIdUsersService  implements FindByIdGateway {
     private final UserMapper userMapper;
 
     @Override
-    public Users findById(Long id) {
+    public UserDetailsResult findById(Long id) {
 
         var users = usersRepository.findById(id)
                 .orElseThrow(() -> new IdFoundAvailableException(ErrorCodeEnum.IAI0001.getMessage(),  ErrorCodeEnum.IAI0001.getCode()));
 
-        return userMapper.userEntityToDomain(users);
+        return new UserDetailsResult(
+                users.getId(),
+                users.getFullName(),
+                users.getEmail(),
+                users.getCreatedAt(),
+                users.getRole()
+        );
     }
 }
