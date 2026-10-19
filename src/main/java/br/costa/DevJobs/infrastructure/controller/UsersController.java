@@ -1,6 +1,6 @@
 package br.costa.DevJobs.infrastructure.controller;
 
-import br.costa.DevJobs.infrastructure.service.userservice.FindAllService;
+import br.costa.DevJobs.infrastructure.dto.response.userresponse.FindAllResponseDto;
 import br.costa.DevJobs.infrastructure.dto.request.userrequest.PatchUserPassRequestDto;
 import br.costa.DevJobs.infrastructure.dto.request.userrequest.PutUserRequestDto;
 import br.costa.DevJobs.infrastructure.dto.request.userrequest.UsersRequestDto;
@@ -28,42 +28,44 @@ public class UsersController {
     private final PutUsersUseCase putUsersUseCase;
     private final PatchPassUseCase patchPassUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
+    private final FindAllUsersUseCase findAllUsersUseCase;
 
 
     private final UserMapper userMapper;
-    private final FindAllService findAllService;
 
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UsersResponseDto create(@RequestBody @Valid UsersRequestDto dto) {
-        registerAccountUseCase.create(userMapper.RequestDtoToUsers(dto));
-        return userMapper.userRequestToUserResponse(dto);
+        return userMapper.RegisterUserToUserResponse(registerAccountUseCase.create(userMapper.RequestDtoToUsersComand(dto)));
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserResponseFindByIdDto findById(@PathVariable Long id) {
-       return userMapper.userDomainToUserResponseFindById(findByIdUsersUseCase.findById(id));
+       return userMapper.userDetailsResultToUserResponseFindById(findByIdUsersUseCase.findById(id));
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserResponseFindByIdDto> findAll() {
-        return findAllService.findAll();
+    public List<FindAllResponseDto> findAll() {
+        return findAllUsersUseCase.findAll().stream().map( userMapper::findAllResultToFindAllResponse)
+                .toList();
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public PutUserResponseDto update(@PathVariable Long id, @RequestBody @Valid PutUserRequestDto dto) {
-        return userMapper.usersDomaintoPutResponseDto(putUsersUseCase.putUsers(userMapper.putUsersRequestDtoToUsers(dto), id));
+        return userMapper.UpdateUserResulttoPutResponseDto(
+                putUsersUseCase.putUsers(userMapper.putUsersRequestDtoToUsersComand(dto), id)
+        );
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void updatePass(@PathVariable Long id, @RequestBody @Valid PatchUserPassRequestDto dto) {
 
-        patchPassUseCase.patchPass(dto.oldPassword(),dto.newPassword(), dto.confirmNewPassword(), id);
+        patchPassUseCase.patchPass(userMapper.patchPassRequestToPatchPassCommand(dto), id);
 
     }
 
