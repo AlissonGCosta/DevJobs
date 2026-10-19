@@ -29,9 +29,6 @@ public class UsersEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, name = "confirm_password")
-    private String confirmPassword;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRoleEnum role;
@@ -48,7 +45,6 @@ public class UsersEntity {
             String fullName,
             String email,
             String password,
-            String confirmPassword,
             UserRoleEnum role,
             Instant createdAt,
             Instant updatedAt,
@@ -57,7 +53,6 @@ public class UsersEntity {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
-        this.confirmPassword = confirmPassword;
         this.role = role;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
