@@ -1,6 +1,7 @@
 package br.costa.DevJobs.application.usecaseimpl.usersusecaseimpl;
 
 import br.costa.DevJobs.application.gateway.usersgateway.FindAllUsersGateway;
+import br.costa.DevJobs.application.result.users.FindAllUsersResult;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.usecase.userusecase.FindAllUsersUseCase;
 
@@ -15,7 +16,9 @@ public class FindAllUsersCaseImpl implements FindAllUsersUseCase {
     }
 
     @Override
-    public List<Users> findAll() {
+    public List<FindAllUsersResult> findAll() {
+
+
         return findAllUsersGateway.findAll();
     }
 }
