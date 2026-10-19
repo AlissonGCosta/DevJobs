@@ -1,7 +1,9 @@
 package br.costa.DevJobs.usecase.userusecase;
 
-import br.costa.DevJobs.core.domain.Users;
+
+import br.costa.DevJobs.application.command.users.RegisterUserRequestCommand;
+import br.costa.DevJobs.application.result.users.RegisterUserResult;
 
 public interface RegisterAccountUseCase {
-    void create(Users user);
+   RegisterUserResult create(RegisterUserRequestCommand userCommand);
 }
