@@ -1,6 +1,8 @@
 package br.costa.DevJobs.infrastructure.service.userservice;
 
 import br.costa.DevJobs.application.gateway.usersgateway.PutUsersGateway;
+import br.costa.DevJobs.application.persistence.user.UpdateUserPersistence;
+import br.costa.DevJobs.application.result.users.UpdateUserResult;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.core.exception.usersexception.IdFoundAvailableException;
 import br.costa.DevJobs.core.exception.enums.ErrorCodeEnum;
@@ -9,6 +11,8 @@ import br.costa.DevJobs.infrastructure.persistence.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -19,21 +23,22 @@ public class PutUsersService implements PutUsersGateway {
 
     @Override
     @Transactional
-    public Users putUsers(Users users) {
+    public UpdateUserResult putUsers(UpdateUserPersistence users, Long id) {
 
-        var userEntity =  usersRepository.findById(users.getId())
+        var userEntity =  usersRepository.findById(id)
                 .orElseThrow(() -> new IdFoundAvailableException(ErrorCodeEnum.IAI0001.getMessage(),
                         ErrorCodeEnum.IAI0001.getCode()));
 
-        userEntity.setFullName(users.getFullName());
-        userEntity.setEmail(users.getEmail());
-        userEntity.setUpdatedAt(users.getUpdatedAt());
+        userEntity.setEmail(users.email());
+        userEntity.setFullName(users.fullName());
+        userEntity.setUpdatedAt(Instant.now());
+
 
         var save =  usersRepository.save(userEntity);
-        var result = userMapper.userEntityToDomain(save);
-        result.setUpdatedAt(save.getUpdatedAt());
+        return userMapper.userEntityToUpdateUserResult(save);
 
-        return result;
+
+
     }
 
 
