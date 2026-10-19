@@ -1,6 +1,7 @@
 package br.costa.DevJobs.infrastructure.service.userservice;
 
 import br.costa.DevJobs.application.gateway.usersgateway.FindAllUsersGateway;
+import br.costa.DevJobs.application.result.users.FindAllUsersResult;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.infrastructure.persistence.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +16,9 @@ public class FindAllUsersService  implements FindAllUsersGateway {
     private final UsersRepository usersRepository;
 
     @Override
-    public List<Users> findAll() {
+    public List<FindAllUsersResult> findAll() {
         return usersRepository.findAll().stream()
-                .map(user -> new Users(
+                .map(user -> new FindAllUsersResult(
                         user.getId(),
                         user.getFullName(),
                         user.getEmail(),
@@ -26,6 +27,5 @@ public class FindAllUsersService  implements FindAllUsersGateway {
                      )
                 )
                 .toList();
-
     }
 }
