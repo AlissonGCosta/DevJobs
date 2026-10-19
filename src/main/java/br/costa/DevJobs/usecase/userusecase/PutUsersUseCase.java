@@ -1,9 +1,11 @@
 package br.costa.DevJobs.usecase.userusecase;
 
-import br.costa.DevJobs.core.domain.Users;
+import br.costa.DevJobs.application.command.users.UpdateUserCommand;
+import br.costa.DevJobs.application.result.users.UpdateUserResult;
+
 
 public interface PutUsersUseCase {
 
-    Users putUsers(Users users, Long id);
+    UpdateUserResult putUsers(UpdateUserCommand userCommand, Long id);
 
 }
