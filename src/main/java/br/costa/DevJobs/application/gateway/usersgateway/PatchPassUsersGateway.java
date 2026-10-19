@@ -3,5 +3,5 @@ package br.costa.DevJobs.application.gateway.usersgateway;
 import br.costa.DevJobs.core.domain.Users;
 
 public interface PatchPassUsersGateway {
-    Boolean patchPass (String newPassword, String confirmNewPassword, Long id);
+    void patchPass (String newPassword, Long id);
 }
