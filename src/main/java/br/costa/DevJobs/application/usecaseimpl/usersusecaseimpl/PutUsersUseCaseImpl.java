@@ -1,6 +1,9 @@
 package br.costa.DevJobs.application.usecaseimpl.usersusecaseimpl;
 
+import br.costa.DevJobs.application.command.users.UpdateUserCommand;
 import br.costa.DevJobs.application.gateway.usersgateway.PutUsersGateway;
+import br.costa.DevJobs.application.persistence.user.UpdateUserPersistence;
+import br.costa.DevJobs.application.result.users.UpdateUserResult;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.core.exception.usersexception.EmailAvaliableException;
 
@@ -26,21 +29,39 @@ public class PutUsersUseCaseImpl implements PutUsersUseCase {
     }
 
     @Override
-    public Users putUsers(Users users, Long id) {
+    public UpdateUserResult putUsers(UpdateUserCommand userCommand, Long id) {
 
         var actual = findByIdUsersUseCase.findById(id);
 
+        Users users = new Users(
+                actual.id(),
+                actual.fullName(),
+                actual.email(),
+                actual.createdAt(),
+                actual.role()
+        );
 
-        if(emailAvailableUseCase.emailAvailable(users.getEmail())){
-            throw new EmailAvaliableException(ErrorCodeEnum.EAA0001.getMessage(),
-                    ErrorCodeEnum.EAA0001.getCode());
-        }
+        if(!users.getEmail().equals(userCommand.email())){
 
-        actual.setEmail(users.getEmail());
-        actual.setFullName(users.getFullName());
-        actual.setUpdatedAt(Instant.now());
+                  if(emailAvailableUseCase.emailAvailable(userCommand.email()))  {
+                      throw new EmailAvaliableException(ErrorCodeEnum.EAA0001.getMessage(),
+                              ErrorCodeEnum.EAA0001.getCode());
+                  }
+
+            }
 
 
-        return putUsersGateway.putUsers(actual);
+
+
+        users.setEmail(userCommand.email());
+        users.setFullName(userCommand.fullName());
+
+        UpdateUserPersistence persistence = new UpdateUserPersistence(
+                users.getFullName(),
+                users.getEmail()
+        );
+
+
+        return putUsersGateway.putUsers(persistence, id);
     }
 }
