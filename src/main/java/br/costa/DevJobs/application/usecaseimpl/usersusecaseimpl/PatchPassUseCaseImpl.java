@@ -1,9 +1,11 @@
 package br.costa.DevJobs.application.usecaseimpl.usersusecaseimpl;
 
+import br.costa.DevJobs.application.command.users.PatchUserPassCommand;
 import br.costa.DevJobs.application.gateway.usersgateway.PatchPassUsersGateway;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.core.exception.enums.ErrorCodeEnum;
 import br.costa.DevJobs.core.exception.usersexception.IdFoundAvailableException;
+import br.costa.DevJobs.core.exception.usersexception.PassAvailableException;
 import br.costa.DevJobs.usecase.userusecase.FindByIdUsersUseCase;
 import br.costa.DevJobs.usecase.userusecase.IdAvailableUseCase;
 import br.costa.DevJobs.usecase.userusecase.PassAvailableUseCase;
@@ -22,15 +24,19 @@ public class PatchPassUseCaseImpl implements PatchPassUseCase {
     }
 
     @Override
-    public void patchPass(String oldPassword, String newPassword, String confirmNewPassword, Long id) {
+    public void patchPass(PatchUserPassCommand userPassCommand, Long id) {
 
         if(Boolean.FALSE.equals(idAvailableUseCase.idAvailable(id))){
             throw new IdFoundAvailableException(ErrorCodeEnum.IAI0001.getMessage(), ErrorCodeEnum.IAI0001.getCode());
         }
 
-        passAvailableUseCase.availablePass(oldPassword, id);
+        passAvailableUseCase.availablePass(userPassCommand.oldPassword(), id);
+
+        if(!userPassCommand.newPassword().equals(userPassCommand.confirmNewPassword())){
+            throw new PassAvailableException(ErrorCodeEnum.PSE0001.getMessage(), ErrorCodeEnum.PSE0001.getCode());
+        }
 
 
-        patchPassUsersGateway.patchPass(newPassword,confirmNewPassword,  id);
+        patchPassUsersGateway.patchPass(userPassCommand.newPassword(),  id);
     }
 }
