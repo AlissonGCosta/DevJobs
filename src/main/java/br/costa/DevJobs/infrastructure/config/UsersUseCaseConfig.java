@@ -1,6 +1,8 @@
 package br.costa.DevJobs.infrastructure.config;
 
 import br.costa.DevJobs.application.gateway.usersgateway.*;
+import br.costa.DevJobs.application.persistence.user.PostUserPersistence;
+import br.costa.DevJobs.application.result.users.RegisterUserResult;
 import br.costa.DevJobs.application.usecaseimpl.usersusecaseimpl.*;
 import br.costa.DevJobs.usecase.userusecase.*;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +19,8 @@ public class UsersUseCaseConfig {
 
     @Bean
     public RegisterAccountUseCase registerAccountUseCase(RegisterUserGateway gateway,
-                                                         EmailAvailableUseCase useCase) {
+                                                         EmailAvailableUseCase useCase
+                                                         ) {
         return new RegisterAccountUseCaseImpl(gateway,
                 useCase);
     }
@@ -63,5 +66,7 @@ public class UsersUseCaseConfig {
                                                IdAvailableUseCase useCase) {
         return new DeleteUserUseCaseImpl(gateway, useCase);
     }
+
+
 
 }
