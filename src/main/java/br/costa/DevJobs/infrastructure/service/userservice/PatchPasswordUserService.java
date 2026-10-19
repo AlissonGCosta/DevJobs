@@ -25,20 +25,17 @@ public class PatchPasswordUserService implements PatchPassUsersGateway {
 
 
     @Override
-    public Boolean patchPass(String newPassword, String confirmNewPassword, Long id) {
-       try{
+    public void patchPass(String newPassword, Long id) {
 
            UsersEntity userEntity = usersRepository.findById(id)
                    .orElseThrow(() -> new IdFoundAvailableException(ErrorCodeEnum.IAI0001.getMessage(),  ErrorCodeEnum.IAI0001.getCode()));
 
            userEntity.setPassword(passwordConfig.passwordEncoder().encode(newPassword));
-           userEntity.setConfirmPassword(passwordConfig.passwordEncoder().encode(confirmNewPassword));
+           userEntity.setUpdatedAt(Instant.now());
 
 
            usersRepository.save(userEntity);
-           return true;
-       }catch(Exception e){
-           return false;
-       }
+
+
     }
 }
