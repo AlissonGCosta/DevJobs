@@ -1,6 +1,7 @@
 package br.costa.DevJobs.application.usecaseimpl.usersusecaseimpl;
 
 import br.costa.DevJobs.application.gateway.usersgateway.FindByIdGateway;
+import br.costa.DevJobs.application.result.users.UserDetailsResult;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.core.exception.usersexception.IdFoundAvailableException;
 import br.costa.DevJobs.core.exception.enums.ErrorCodeEnum;
@@ -19,7 +20,7 @@ public class FindByIdUsersUseCaseImpl implements FindByIdUsersUseCase {
     }
 
     @Override
-    public Users findById(Long id) {
+    public UserDetailsResult findById(Long id) {
 
         if(!idAvailableUseCase.idAvailable(id)) {
             throw new IdFoundAvailableException(ErrorCodeEnum.IAI0001.getMessage(),  ErrorCodeEnum.IAI0001.getCode());
