@@ -145,13 +145,11 @@ public class Users {
     }
 
     public Users(
-            String oldPassword,
-            String password,
-            String confirmPassword){
+            String password
+    ){
 
-        this.oldPassword = oldPassword;
         validatePassword(password);
-        validateEqualsPassword(confirmPassword);
+
     }
 
 
