@@ -46,7 +46,7 @@ public class UserMapper {
                 entity.getId(),
                 entity.getFullName(),
                 entity.getEmail(),
-                entity.getCreatedAt(),
+                entity.getUpdatedAt(),
                 entity.getRole()
         );
     }
@@ -71,9 +71,10 @@ public class UserMapper {
     public PutUserResponseDto UpdateUserResulttoPutResponseDto(UpdateUserResult user) {
         return new PutUserResponseDto(
                 user.id(),
-                user.email(),
                 user.fullName(),
-                user.updatedAt()
+                user.email(),
+                user.updatedAt(),
+                user.role()
         );
     }
 
