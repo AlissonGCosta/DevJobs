@@ -6,8 +6,8 @@ import java.time.Instant;
 
 public record UpdateUserResult(
         Long id,
-        String email,
         String fullName,
+        String email,
         Instant updatedAt,
         UserRoleEnum role
 ) {
