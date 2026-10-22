@@ -2,9 +2,9 @@
 
 Back-end em Java e Spring Boot para organizar vagas de emprego, candidaturas e entrevistas.
 
-**Estado em 19/10/2026:** a API de usuários possui cadastro, consulta, listagem, atualização de perfil, troca de senha e exclusão. Os fluxos passaram a usar records de comando, persistência e resultado. A confirmação de senha deixou de fazer parte da entidade JPA, e as respostas de cadastro e atualização passaram a incluir o ID. A compilação passou; os sete testes executados tiveram uma falha já registrada na etapa anterior. Há inconsistências no fluxo de atualização de perfil, detalhadas abaixo.
+**Estado em 22/10/2026:** a API de usuários possui cadastro, consulta, listagem, atualização de perfil, troca de senha e exclusão. A atualização de perfil teve os campos nome/e-mail e a data de modificação corrigidos, e sua resposta inclui `roles`. O PATCH aplica a regra de tamanho de senha do domínio e usa um record próprio de persistência. A compilação passou; dos 107 testes executados, 98 passaram e 9 falharam. As pendências estão detalhadas abaixo.
 
-O [planejamento original](DevJobs-Projeto.md) descreve o produto desejado. O [registro de 19/10/2026](docs/atualizacao-2026-10-19.md) apresenta as mudanças desta etapa, as limitações identificadas e os commits por arquivo. Etapas anteriores: [18/09](docs/atualizacao-2026-09-18.md), [30/09](docs/atualizacao-2026-09-30.md), [04/10](docs/atualizacao-2026-10-04.md) e [08/10](docs/atualizacao-2026-10-08.md).
+O [planejamento original](DevJobs-Projeto.md) descreve o produto desejado. O [relatório de 22/10/2026](docs/atualizacao-2026-10-22.md) apresenta as mudanças desta etapa, as nove falhas de teste e os commits por arquivo. Etapas anteriores disponíveis: [18/09](docs/atualizacao-2026-09-18.md), [30/09](docs/atualizacao-2026-09-30.md), [04/10](docs/atualizacao-2026-10-04.md) e [08/10](docs/atualizacao-2026-10-08.md).
 
 ## Tecnologias
 
@@ -16,11 +16,11 @@ O [planejamento original](DevJobs-Projeto.md) descreve o produto desejado. O [re
 | Spring Web MVC | API REST de usuários. |
 | Spring Data JPA | Entidade de usuários, repository e persistência. |
 | Spring Security | Configuração permissiva de desenvolvimento e BCrypt. |
-| Bean Validation | `@Valid` no controller e `@NotNull` nos DTOs de entrada. |
+| Bean Validation | `@Valid` no controller, `@NotNull` nos DTOs de entrada e `@Email` no cadastro. |
 | H2 | Banco em memória configurado para desenvolvimento. |
 | PostgreSQL e Flyway | Dependências presentes; conexão PostgreSQL e migrações ainda pendentes. Flyway desabilitado localmente. |
 | Lombok | Construtores, getters e setters da infraestrutura. |
-| JUnit Jupiter | Seis testes de domínio e um de contexto Spring. |
+| JUnit Jupiter e Mockito | 107 execuções de testes de domínio, casos de uso, mappers, serviços, contexto Spring e API com MockMvc/H2. |
 
 ## Execução local
 
@@ -88,7 +88,7 @@ O fluxo de escrita segue DTO de entrada -> `UserMapper` -> comando -> caso de us
 | Grupo | Records presentes |
 | --- | --- |
 | Comandos | `RegisterUserRequestCommand`, `UpdateUserCommand`, `PatchUserPassCommand`. |
-| Persistência | `PostUserPersistence`, `UpdateUserPersistence`. |
+| Persistência | `PostUserPersistence`, `UpdateUserPersistence`, `UpdatePassUserPersistence`. |
 | Resultados | `RegisterUserResult`, `UpdateUserResult`, `UserDetailsResult`, `FindAllUsersResult`. |
 
 O domínio permanece sem anotações JPA. `UsersUseCaseConfig` compõe os casos de uso com gateways. `CreateUserEntityService` transforma os dados de cadastro em `UsersEntity` e gera o hash BCrypt da senha. `confirmPassword` continua na entrada e no domínio para validação, mas não está em `PostUserPersistence` nem em `UsersEntity`.
@@ -99,14 +99,14 @@ Os modelos de vaga (`JobVacancy`), candidatura (`JobApplication`), entrevista (`
 
 ## API de usuários
 
-Base: `http://localhost:8080/v1/users`. Os contratos abaixo vêm de [UsersController](src/main/java/br/costa/DevJobs/infrastructure/controller/UsersController.java). Os endpoints não foram exercitados via HTTP nesta entrega; a atualização possui as inconsistências descritas após a tabela.
+Base: `http://localhost:8080/v1/users`. Os contratos abaixo vêm de [UsersController](src/main/java/br/costa/DevJobs/infrastructure/controller/UsersController.java). Os fluxos foram exercitados por MockMvc com H2 isolado, sem servidor HTTP externo; seis das 46 execuções de integração falharam por validação ou formato da resposta de erro.
 
 | Método e rota | Entrada | Sucesso declarado |
 | --- | --- | --- |
 | `POST /v1/users` | `fullName`, `email`, `password`, `confirmPassword` | `201`: `id`, `fullName`, `email`. |
 | `GET /v1/users/{id}` | ID no caminho | `200`: `id`, `fullName`, `email`, `createdAt`, `role`. |
 | `GET /v1/users` | Sem corpo | `200`: lista com os mesmos campos da consulta por ID, sem paginação. |
-| `PUT /v1/users/{id}` | ID; `fullName`, `email` no corpo | `200`: `id`, `fullName`, `email`, `updatedAt`. |
+| `PUT /v1/users/{id}` | ID; `fullName`, `email` no corpo | `200`: `id`, `fullName`, `email`, `updatedAt`, `roles`. |
 | `PATCH /v1/users/{id}` | ID; `oldPassword`, `newPassword`, `confirmNewPassword` no corpo | `200`, sem corpo. |
 | `DELETE /v1/users/{id}` | ID no caminho, sem corpo | `204`, sem corpo. |
 
@@ -136,7 +136,7 @@ Base: `http://localhost:8080/v1/users`. Os contratos abaixo vêm de [UsersContro
 
 O caso de uso consulta o usuário, reconstrói o domínio e valida o nome pelo setter. A verificação de duplicidade só ocorre quando o novo e-mail difere do atual, permitindo passar pela verificação com o próprio e-mail. `PutUsersService` altera a entidade em método transacional e atualiza `updatedAt`.
 
-**Pendências identificadas por leitura do código:** `UpdateUserPersistence` declara os campos na ordem `email, fullName`, mas o caso de uso fornece `fullName, email`. O serviço usa os accessors do record, portanto recebe nome e e-mail invertidos para gravação. As conversões entre entidade, `UpdateUserResult` e DTO também têm inversões de posição; o mapper preenche `updatedAt` com `createdAt`. Não se deve considerar o fluxo de atualização validado apenas pelo sucesso da compilação. O [registro desta etapa](docs/atualizacao-2026-10-19.md) detalha cada conversão.
+`UpdateUserPersistence` e `UpdateUserResult` agora recebem `fullName` antes de `email`, acompanhando o caso de uso e o mapper. A resposta preserva os campos e usa `updatedAt` da entidade; inclui o papel no campo JSON `roles`. Os cenários de integração de atualização válida passaram. Permanecem dois testes unitários com dados montados na ordem antiga, além da ausência de validação de formato de e-mail no PUT, que aceita os três valores inválidos testados.
 
 ### Troca de senha
 
@@ -151,9 +151,10 @@ O caso de uso consulta o usuário, reconstrói o domínio e valida o nome pelo s
 1. O controller valida os campos não nulos e cria `PatchUserPassCommand`.
 2. O caso de uso verifica a existência do ID e confere a senha antiga contra o hash persistido por BCrypt.
 3. O caso de uso compara `newPassword` e `confirmNewPassword`; divergência lança `PassAvailableException`, tratada como HTTP `409`.
-4. O gateway recebe somente a nova senha e o ID. O serviço carrega a entidade, grava um hash BCrypt, atualiza `updatedAt` e salva.
+4. O caso de uso constrói `Users` com a nova senha e aplica o limite de 8 a 64 caracteres antes de criar `UpdatePassUserPersistence`.
+5. O gateway recebe esse record e o ID. O serviço carrega a entidade, grava um hash BCrypt, atualiza `updatedAt` e salva.
 
-O serviço não captura mais qualquer exceção para retornar `false`; falhas interrompem o fluxo. A confirmação não é persistida. A validação de tamanho entre 8 e 64 caracteres do domínio ainda não é chamada pelo PATCH. O serviço também não declara uma transação que englobe a consulta e a gravação.
+O serviço não captura mais qualquer exceção para retornar `false`; falhas interrompem o fluxo. A confirmação não é persistida. Os testes de casos de uso e integração cobrem a rejeição de senhas de 0, 7 e 65 caracteres. O serviço ainda não declara uma transação que englobe a consulta e a gravação.
 
 ### Exclusão
 
@@ -164,10 +165,10 @@ O serviço não captura mais qualquer exceção para retornar `false`; falhas in
 | Regra de domínio | Uso atual | Exceção |
 | --- | --- | --- |
 | Nome entre 6 e 100 caracteres | Cadastro e setter usado na atualização. | `ValidateFullNameException`, código `VPN0001`. |
-| Senha entre 8 e 64 caracteres | Cadastro; não aplicada pelo fluxo atual do PATCH. | `InvalidPasswordException`, código `IPN0001`. |
+| Senha entre 8 e 64 caracteres | Cadastro e PATCH. | `InvalidPasswordException`, código `IPN0001`. |
 | Confirmação igual à senha | Cadastro pelo domínio; PATCH por comparação no caso de uso. | `PassAvailableException`: código `IPN0002` no cadastro e `PSS0001` no PATCH. |
 
-Os DTOs de entrada exigem campos não nulos, sem `@NotBlank` ou validação de formato de e-mail. Não há normalização de espaços. `GlobalExceptionHandler` produz `timestamp`, `status`, `erro`, `message`, `path` e `errors`; os handlers atuais deixam `errors` nulo e não expõem o código da exceção.
+Os DTOs de entrada exigem campos não nulos. O cadastro também usa `@Email`, mas ainda aceita e-mail vazio; o PUT não valida o formato. Não há `@NotBlank` nem normalização de espaços, e um nome com seis espaços é aceito. `GlobalExceptionHandler` produz `timestamp`, `status`, `erro`, `message`, `path` e `errors`; os handlers atuais deixam `errors` nulo e não expõem o código da exceção.
 
 | Exceção tratada | HTTP |
 | --- | --- |
@@ -180,22 +181,22 @@ Os DTOs de entrada exigem campos não nulos, sem `@NotBlank` ou validação de f
 
 O handler de `InternalServerErrorException` permanece, embora o cadastro não lance mais essa exceção a partir de um booleano. Exceções de persistência propagadas não têm tratamento específico nesse handler. As respostas de Bean Validation também não são padronizadas por ele.
 
-## Verificação em 19/10/2026
+## Verificação em 22/10/2026
 
 Comando final: `.\mvnw.cmd clean test -B -ntp`, com Java **25.0.2**, Maven **3.9.16** e compilação em **release 21**.
 
-**Resultado: BUILD FAILURE na etapa de testes; 7 executados, 1 falha, 0 erros e 0 ignorados.** A compilação dos 83 arquivos principais e dos dois arquivos de teste passou. `DevJobsApplicationTests.contextLoads` passou com H2.
+**Resultado: BUILD FAILURE na etapa de testes; 107 executados, 9 falhas, 0 erros e 0 ignorados.** A compilação dos 84 arquivos principais e dos sete arquivos de teste passou. `DevJobsApplicationTests.contextLoads` passou com H2.
 
-O teste `UsersTest.shouldRejectdiferentPass` espera `InvalidPasswordException`, mas `Users.validateEqualsPassword` lança `PassAvailableException`. A mesma divergência foi registrada em 08/10; o teste permanece inalterado nesta entrega. Os relatórios estão em `target/surefire-reports`, ignorado pelo Git.
+As nove falhas são: uma expectativa antiga de exceção em `UsersTest`; dois testes unitários que constroem records com nome/e-mail na ordem antiga; três entradas de e-mail inválido aceitas no PUT; e-mail vazio aceito no cadastro; nome com espaços aceito no cadastro; e ausência do envelope próprio nos erros de Bean Validation. O [relatório desta etapa](docs/atualizacao-2026-10-22.md) apresenta os métodos e resultados por classe. Os relatórios brutos estão em `target/surefire-reports`, ignorado pelo Git.
 
-Não há testes específicos de casos de uso, mapeamento dos records, endpoints ou persistência desses fluxos. O teste de contexto confirma a composição Spring, sem validar os contratos HTTP. As pendências de mapeamento acima foram identificadas por inspeção estática. O ajuste feito no Java durante esta organização foi remover o import e a injeção do componente excluído `FindAllService` no controller.
+Foram acrescentadas cinco classes de teste, com 100 novas execuções. A integração usa MockMvc e um banco H2 em memória exclusivo dos testes da API, com limpeza antes de cada caso. Os arquivos Java recebidos foram preservados durante a organização dos commits; as falhas encontradas ficam registradas para correção posterior.
 
 ## Próximas etapas
 
-- Corrigir a ordem de nome/e-mail em `UpdateUserPersistence` e nas conversões de `UpdateUserResult`; retornar a data de atualização real.
+- Atualizar os dados dos testes unitários para a nova ordem `fullName, email` dos records.
 - Alinhar o teste de confirmação divergente ao contrato de exceção definido pelo domínio.
-- Aplicar a validação de tamanho de senha no PATCH e revisar os limites transacionais desse fluxo.
-- Cobrir cadastro, atualização e troca de senha com testes de mapeamento, casos de uso e persistência.
+- Rejeitar e-mail vazio no cadastro, e-mail inválido no PUT e nome composto apenas por espaços.
+- Revisar os limites transacionais do fluxo de troca de senha.
 - Padronizar as respostas de Bean Validation e de falhas de persistência.
 - Revisar os componentes e imports sem uso após a refatoração.
 - Implementar autenticação, autorização, PostgreSQL, migrações e paginação.
@@ -203,4 +204,4 @@ Não há testes específicos de casos de uso, mapeamento dos records, endpoints 
 
 ## Convenção dos commits
 
-As mensagens seguem `tipo(escopo): descrição`, com um commit dedicado para cada arquivo alterado, criado ou excluído, inclusive documentação. Esta etapa reúne 39 caminhos Java, este README e um novo registro: **41 commits para 41 arquivos**. A relação está no [registro de 19/10/2026](docs/atualizacao-2026-10-19.md).
+As mensagens seguem Conventional Commits no formato `tipo(escopo): descrição`, com um commit dedicado para cada arquivo alterado ou criado, inclusive documentação. Esta etapa reúne 15 caminhos Java, este README e um novo relatório: **17 commits para 17 arquivos**. A relação está no [relatório de 22/10/2026](docs/atualizacao-2026-10-22.md).
