@@ -1,7 +1,7 @@
 package br.costa.DevJobs.application.gateway.usersgateway;
 
-import br.costa.DevJobs.core.domain.Users;
+import br.costa.DevJobs.application.persistence.user.UpdatePassUserPersistence;
 
 public interface PatchPassUsersGateway {
-    void patchPass (String newPassword, Long id);
+    void patchPass (UpdatePassUserPersistence password, Long id);
 }
