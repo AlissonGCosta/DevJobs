@@ -2,6 +2,7 @@ package br.costa.DevJobs.application.usecaseimpl.usersusecaseimpl;
 
 import br.costa.DevJobs.application.command.users.PatchUserPassCommand;
 import br.costa.DevJobs.application.gateway.usersgateway.PatchPassUsersGateway;
+import br.costa.DevJobs.application.persistence.user.UpdatePassUserPersistence;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.core.exception.enums.ErrorCodeEnum;
 import br.costa.DevJobs.core.exception.usersexception.IdFoundAvailableException;
@@ -36,7 +37,12 @@ public class PatchPassUseCaseImpl implements PatchPassUseCase {
             throw new PassAvailableException(ErrorCodeEnum.PSE0001.getMessage(), ErrorCodeEnum.PSE0001.getCode());
         }
 
+        Users user = new Users(userPassCommand.newPassword());
 
-        patchPassUsersGateway.patchPass(userPassCommand.newPassword(),  id);
+        UpdatePassUserPersistence persistUserPass = new UpdatePassUserPersistence(
+                user.getPassword()
+        );
+
+        patchPassUsersGateway.patchPass(persistUserPass,  id);
     }
 }
