@@ -1,6 +1,7 @@
 package br.costa.DevJobs.infrastructure.service.userservice;
 
 import br.costa.DevJobs.application.gateway.usersgateway.PatchPassUsersGateway;
+import br.costa.DevJobs.application.persistence.user.UpdatePassUserPersistence;
 import br.costa.DevJobs.core.domain.Users;
 import br.costa.DevJobs.core.exception.enums.ErrorCodeEnum;
 import br.costa.DevJobs.core.exception.usersexception.IdFoundAvailableException;
@@ -25,12 +26,12 @@ public class PatchPasswordUserService implements PatchPassUsersGateway {
 
 
     @Override
-    public void patchPass(String newPassword, Long id) {
+    public void patchPass(UpdatePassUserPersistence newPassword, Long id) {
 
            UsersEntity userEntity = usersRepository.findById(id)
                    .orElseThrow(() -> new IdFoundAvailableException(ErrorCodeEnum.IAI0001.getMessage(),  ErrorCodeEnum.IAI0001.getCode()));
 
-           userEntity.setPassword(passwordConfig.passwordEncoder().encode(newPassword));
+           userEntity.setPassword(passwordConfig.passwordEncoder().encode(newPassword.password()));
            userEntity.setUpdatedAt(Instant.now());
 
 
